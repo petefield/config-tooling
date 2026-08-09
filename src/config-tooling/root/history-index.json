@@ -1,10 +1,17 @@
 {
-  "GeneratedAtUtc": "2026-08-09T08:28:51.1786503+00:00",
+  "GeneratedAtUtc": "2026-08-09T09:09:19.9822466+00:00",
   "Files": [
     {
       "OutputFile": "ndc/dev/Email_AccountClosed.json",
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
@@ -26,6 +33,13 @@
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -45,6 +59,13 @@
       "OutputFile": "ndc/prd/Email_AccountClosed.json",
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
@@ -66,6 +87,13 @@
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -85,6 +113,13 @@
       "OutputFile": "a05/uat/Email_AccountClosed.json",
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
@@ -106,6 +141,13 @@
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -126,6 +168,13 @@
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -138,6 +187,13 @@
       "OutputFile": "ndc/uat/Letter_AccountClosed.json",
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",
@@ -152,6 +208,13 @@
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -164,6 +227,13 @@
       "OutputFile": "a05/dev/Letter_AccountClosed.json",
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",
@@ -178,6 +248,13 @@
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
+        {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
@@ -190,6 +267,13 @@
       "OutputFile": "a05/prd/Letter_AccountClosed.json",
       "SourceFile": "configs/Letter_AccountClosed.json",
       "Modifications": [
+        {
+          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
+          "AuthorName": "Pete",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T09:40:37+01:00",
+          "Message": "add browser"
+        },
         {
           "Commit": "c3406547239e683166a32dfacb600d71603437ad",
           "AuthorName": "Pete",

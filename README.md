@@ -25,4 +25,4 @@ A standalone Blazor WebAssembly browser app lives in `src/config-browser`.
 1. Generate fresh output with the console app so `src/config-tooling/root` contains the latest files.
 2. Start the browser app from `src/config-browser` with `dotnet run`.
 
-The browser app syncs `src/config-tooling/root` into its own `wwwroot/data` during build, then lets you filter by tenant and environment, browse the generated files, and open a detail page for each config.
+The GitHub Pages workflow copies `src/config-tooling/root` into the published browser site's `wwwroot/data` folder, then deploys that artifact. The browser app lets you filter by tenant and environment, browse the generated files, and open a detail page for each config.

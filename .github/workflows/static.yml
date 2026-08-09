@@ -38,8 +38,15 @@ jobs:
           dotnet-version: 10.0.x
       - name: Generate config data
         run: dotnet run --project ./src/config-tooling/config-tooling.csproj -- ./configs ./src/config-tooling/root
+      - name: Verify generated config data
+        run: test -f ./src/config-tooling/root/history-index.json
       - name: Publish browser app
-        run: dotnet publish ./src/config-browser/config-browser.csproj -c Release -o ./artifacts/config-browser
+        working-directory: ./src/config-browser
+        run: dotnet publish ./config-browser.csproj -c Release -o ../../artifacts/config-browser
+      - name: Copy generated config data into published site
+        run: |
+          mkdir -p ./artifacts/config-browser/wwwroot/data
+          cp -R ./src/config-tooling/root/. ./artifacts/config-browser/wwwroot/data/
       - name: Configure published site
         run: |
           sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' ./artifacts/config-browser/wwwroot/index.html

@@ -12,17 +12,4 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.7" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="SyncGeneratedConfigData" BeforeTargets="PrepareForBuild">
-    <RemoveDir Directories="wwwroot/data" Condition="Exists('wwwroot/data')" />
-    <MakeDir Directories="wwwroot/data" />
-
-    <ItemGroup>
-      <GeneratedConfigData Include="../config-tooling/root/**/*" />
-    </ItemGroup>
-
-    <Copy
-      SourceFiles="@(GeneratedConfigData)"
-      DestinationFiles="@(GeneratedConfigData->'wwwroot/data/%(RecursiveDir)%(Filename)%(Extension)')" />
-  </Target>
-
 </Project>

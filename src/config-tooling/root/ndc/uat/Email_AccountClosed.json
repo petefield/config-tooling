@@ -1,7 +1,7 @@
 {
     "operationUnit": "atc",
     "connector": "Salesforce",
-    "channel": "Letter",
+    "channel": "email",
     "trigger": "ProactiveLimitIncreaseCompleted",
     "outputType": "JSON",
     "inputData": [
