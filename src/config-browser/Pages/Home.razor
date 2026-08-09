@@ -1,0 +1,208 @@
+﻿@page "/"
+@inject ConfigDataService DataService
+
+<PageTitle>Config Browser</PageTitle>
+
+@if (isLoading)
+{
+    <section class="state-card">
+        <h1>Loading config catalog</h1>
+        <p>Reading the generated config index and available files.</p>
+    </section>
+}
+else if (errorMessage is not null)
+{
+    <section class="state-card error-state">
+        <h1>Config data unavailable</h1>
+        <p>@errorMessage</p>
+    </section>
+}
+else if (catalog is null || catalog.Entries.Count == 0)
+{
+    <section class="state-card">
+        <h1>No config files found</h1>
+        <p>Run the config tooling generator so the browser has data to display.</p>
+    </section>
+}
+else
+{
+    <section class="hero-card">
+        <div>
+            <h1>Generated config browser</h1>
+            <p>Filter by tenant and environment, then open any generated config for a clean detail view.</p>
+        </div>
+
+        <dl class="hero-stats">
+            <div>
+                <dt>Files</dt>
+                <dd>@catalog.Entries.Count</dd>
+            </div>
+            <div>
+                <dt>Tenants</dt>
+                <dd>@TenantOptions.Count(option => option != AllOption)</dd>
+            </div>
+            <div>
+                <dt>Generated</dt>
+                <dd>@catalog.GeneratedAtUtc.ToLocalTime().ToString("g")</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="browser-grid">
+        <aside class="filters-card">
+            <h2>Filters</h2>
+
+            <label class="filter-field" for="tenant-filter">
+                <span>Tenant</span>
+                <select id="tenant-filter" @bind="selectedTenant" @bind:after="EnsureSelectedEnvironmentIsValid">
+                    @foreach (var tenant in TenantOptions)
+                    {
+                        <option value="@tenant">@FormatOptionLabel(tenant)</option>
+                    }
+                </select>
+            </label>
+
+            <label class="filter-field" for="environment-filter">
+                <span>Environment</span>
+                <select id="environment-filter" @bind="selectedEnvironment">
+                    @foreach (var environment in EnvironmentOptions)
+                    {
+                        <option value="@environment">@FormatOptionLabel(environment)</option>
+                    }
+                </select>
+            </label>
+        </aside>
+
+        <section class="results-card">
+            <div class="results-header">
+                <div>
+                    <h2>Config files</h2>
+                    <p>@FilteredEntries.Count entry@(FilteredEntries.Count == 1 ? string.Empty : "ies") match the current filters.</p>
+                </div>
+            </div>
+
+            @if (FilteredEntries.Count == 0)
+            {
+                <div class="empty-results">
+                    <p>No generated configs match the current tenant and environment selection.</p>
+                </div>
+            }
+            else
+            {
+                <div class="results-list">
+                    @foreach (var entry in FilteredEntries)
+                    {
+                        <a class="result-item" href="@BuildDetailsUri(entry)">
+                            <div class="result-topline">
+                                <h3>@entry.FileName</h3>
+                                <span class="result-badge">@entry.Tenant / @entry.Environment.ToUpperInvariant()</span>
+                            </div>
+
+                            <dl class="result-meta">
+                                <div>
+                                    <dt>Source</dt>
+                                    <dd>@entry.SourceFile</dd>
+                                </div>
+                                <div>
+                                    <dt>Last change</dt>
+                                    <dd>@GetLastChangeSummary(entry)</dd>
+                                </div>
+                            </dl>
+                        </a>
+                    }
+                </div>
+            }
+        </section>
+    </section>
+}
+
+@code {
+    private const string AllOption = "all";
+
+    private ConfigCatalog? catalog;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string selectedTenant = AllOption;
+    private string selectedEnvironment = AllOption;
+
+    private IReadOnlyList<ConfigCatalogEntry> FilteredEntries =>
+        catalog?.Entries
+            .Where(MatchesTenant)
+            .Where(MatchesEnvironment)
+            .ToArray() ?? [];
+
+    private IReadOnlyList<string> TenantOptions =>
+        catalog is null
+            ? [AllOption]
+            : [AllOption, .. catalog.Entries
+                .Select(static entry => entry.Tenant)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(static value => value, StringComparer.OrdinalIgnoreCase)];
+
+    private IReadOnlyList<string> EnvironmentOptions
+    {
+        get
+        {
+            if (catalog is null)
+            {
+                return [AllOption];
+            }
+
+            var entries = selectedTenant == AllOption
+                ? catalog.Entries
+                : catalog.Entries.Where(entry => string.Equals(entry.Tenant, selectedTenant, StringComparison.OrdinalIgnoreCase));
+
+            return [AllOption, .. entries
+                .Select(static entry => entry.Environment)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(static value => value, StringComparer.OrdinalIgnoreCase)];
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            catalog = await DataService.GetCatalogAsync();
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string BuildDetailsUri(ConfigCatalogEntry entry) =>
+        $"/config?path={Uri.EscapeDataString(entry.OutputFile)}";
+
+    private static string FormatOptionLabel(string value) =>
+        value == AllOption ? "All" : value.ToUpperInvariant();
+
+    private bool MatchesTenant(ConfigCatalogEntry entry) =>
+        selectedTenant == AllOption ||
+        string.Equals(entry.Tenant, selectedTenant, StringComparison.OrdinalIgnoreCase);
+
+    private bool MatchesEnvironment(ConfigCatalogEntry entry) =>
+        selectedEnvironment == AllOption ||
+        string.Equals(entry.Environment, selectedEnvironment, StringComparison.OrdinalIgnoreCase);
+
+    private void EnsureSelectedEnvironmentIsValid()
+    {
+        if (!EnvironmentOptions.Contains(selectedEnvironment, StringComparer.OrdinalIgnoreCase))
+        {
+            selectedEnvironment = AllOption;
+        }
+    }
+
+    private static string GetLastChangeSummary(ConfigCatalogEntry entry)
+    {
+        var lastChange = entry.Modifications.FirstOrDefault();
+
+        return lastChange is null
+            ? "No git history found"
+            : $"{lastChange.Message} • {lastChange.AuthorDate.ToLocalTime():g}";
+    }
+}

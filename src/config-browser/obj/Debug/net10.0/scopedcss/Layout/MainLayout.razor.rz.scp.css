@@ -1,0 +1,42 @@
+.app-shell[b-zf9g15fzca] {
+    min-height: 100vh;
+}
+
+.app-header[b-zf9g15fzca] {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(16px);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.header-content[b-zf9g15fzca] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+}
+
+.brand-link[b-zf9g15fzca] {
+    color: #f8fafc;
+    display: inline-block;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+}
+
+.brand-link:hover[b-zf9g15fzca] {
+    color: #bfdbfe;
+}
+
+.brand-copy[b-zf9g15fzca] {
+    color: #cbd5e1;
+    margin: 0.35rem 0 0;
+}
+
+.app-main[b-zf9g15fzca] {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 3rem;
+}

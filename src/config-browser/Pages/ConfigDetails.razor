@@ -1,0 +1,279 @@
+﻿@page "/config"
+@using System.Text.Json
+@inject ConfigDataService DataService
+
+<PageTitle>@PageTitleText</PageTitle>
+
+@if (isLoading)
+{
+    <section class="state-card">
+        <h1>Loading config details</h1>
+        <p>Fetching the selected generated config file.</p>
+    </section>
+}
+else if (errorMessage is not null)
+{
+    <section class="state-card error-state">
+        <h1>Unable to open config</h1>
+        <p>@errorMessage</p>
+        <a class="back-link" href="">Return to the config list</a>
+    </section>
+}
+else if (selectedEntry is null || selectedConfig is null)
+{
+    <section class="state-card">
+        <h1>Config not found</h1>
+        <p>The selected config file could not be located.</p>
+        <a class="back-link" href="">Return to the config list</a>
+    </section>
+}
+else
+{
+    <div class="details-shell">
+        <a class="back-link" href="">← Back to config list</a>
+
+        <section class="details-hero">
+            <div>
+                <p class="eyebrow">@selectedEntry.Tenant / @selectedEntry.Environment.ToUpperInvariant()</p>
+                <h1>@selectedEntry.FileName</h1>
+                <p class="hero-copy">@selectedEntry.SourceFile</p>
+            </div>
+
+            <div class="hero-tags">
+                <span>@selectedConfig.Channel ?? "Unknown channel"</span>
+                <span>@selectedConfig.Trigger ?? "Unknown trigger"</span>
+                <span>@selectedConfig.Connector ?? "Unknown connector"</span>
+            </div>
+        </section>
+
+        <section class="details-grid">
+            <div class="detail-card">
+                <h2>Overview</h2>
+                <dl class="overview-grid">
+                    <div>
+                        <dt>Operation unit</dt>
+                        <dd>@DisplayValue(selectedConfig.OperationUnit)</dd>
+                    </div>
+                    <div>
+                        <dt>Channel</dt>
+                        <dd>@DisplayValue(selectedConfig.Channel)</dd>
+                    </div>
+                    <div>
+                        <dt>Trigger</dt>
+                        <dd>@DisplayValue(selectedConfig.Trigger)</dd>
+                    </div>
+                    <div>
+                        <dt>Connector</dt>
+                        <dd>@DisplayValue(selectedConfig.Connector)</dd>
+                    </div>
+                    <div>
+                        <dt>Output type</dt>
+                        <dd>@DisplayValue(selectedConfig.OutputType)</dd>
+                    </div>
+                    <div>
+                        <dt>Generated file</dt>
+                        <dd>@selectedEntry.OutputFile</dd>
+                    </div>
+                </dl>
+            </div>
+
+            <div class="detail-card">
+                <h2>Feature flags</h2>
+                <div class="pill-list">
+                    @foreach (var flag in selectedConfig.FeatureFlags)
+                    {
+                        <div class="pill-card">
+                            <strong>@DisplayValue(flag.Tenant)</strong>
+                            <span>@(flag.Enabled ? "Enabled" : "Disabled")</span>
+                            <small>@string.Join(", ", flag.Environments.Select(environment => environment.ToUpperInvariant()))</small>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (selectedConfig.Condition is not null)
+            {
+                <div class="detail-card detail-card-wide">
+                    <h2>Condition</h2>
+                    <p class="condition-description">@DisplayValue(selectedConfig.Condition.Description)</p>
+                    <pre>@selectedConfig.Condition.Expression</pre>
+                </div>
+            }
+
+            <div class="detail-card detail-card-wide">
+                <div class="section-heading">
+                    <h2>Input data</h2>
+                    <span>@selectedConfig.InputData.Count field(s)</span>
+                </div>
+
+                @if (selectedConfig.InputData.Count == 0)
+                {
+                    <p class="section-empty">No input fields are defined for this config.</p>
+                }
+                else
+                {
+                    <div class="table-wrap">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Path</th>
+                                    <th>Required</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var input in selectedConfig.InputData)
+                                {
+                                    <tr>
+                                        <td>@DisplayValue(input.Name)</td>
+                                        <td>@DisplayValue(input.Type)</td>
+                                        <td><code>@DisplayValue(input.Path)</code></td>
+                                        <td>@(input.Required == true ? "Yes" : "No")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="detail-card detail-card-wide">
+                <div class="section-heading">
+                    <h2>Mappings</h2>
+                    <span>@selectedConfig.Mapping.Count mapping(s)</span>
+                </div>
+
+                @if (selectedConfig.Mapping.Count == 0)
+                {
+                    <p class="section-empty">No mappings are defined for this config.</p>
+                }
+                else
+                {
+                    <div class="table-wrap">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Input field</th>
+                                    <th>Output field</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var mapping in selectedConfig.Mapping)
+                                {
+                                    <tr>
+                                        <td><code>@DisplayValue(mapping.InputField)</code></td>
+                                        <td>@DisplayValue(mapping.OutputField)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+
+            <div class="detail-card">
+                <div class="section-heading">
+                    <h2>Git history</h2>
+                    <span>@selectedEntry.Modifications.Count commit(s)</span>
+                </div>
+
+                @if (selectedEntry.Modifications.Count == 0)
+                {
+                    <p class="section-empty">No git history is available for this source file.</p>
+                }
+                else
+                {
+                    <ol class="history-list">
+                        @foreach (var modification in selectedEntry.Modifications)
+                        {
+                            <li>
+                                <strong>@modification.Message</strong>
+                                <span>@modification.AuthorName · @modification.AuthorDate.ToLocalTime():g</span>
+                                <code>@modification.Commit[..8]</code>
+                            </li>
+                        }
+                    </ol>
+                }
+            </div>
+
+            @if (selectedConfig.AdditionalProperties.Count > 0)
+            {
+                <div class="detail-card detail-card-wide">
+                    <h2>Additional sections</h2>
+
+                    @foreach (var property in selectedConfig.AdditionalProperties.OrderBy(static property => property.Key, StringComparer.OrdinalIgnoreCase))
+                    {
+                        <details class="json-section">
+                            <summary>@property.Key</summary>
+                            <pre>@FormatJson(property.Value)</pre>
+                        </details>
+                    }
+                </div>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "path")]
+    public string? Path { get; set; }
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        WriteIndented = true
+    };
+
+    private ConfigCatalogEntry? selectedEntry;
+    private ConfigDocument? selectedConfig;
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private string PageTitleText =>
+        selectedEntry is null
+            ? "Config Details"
+            : $"{selectedEntry.FileName} • {selectedEntry.Tenant}/{selectedEntry.Environment}";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+        selectedEntry = null;
+        selectedConfig = null;
+
+        if (string.IsNullOrWhiteSpace(Path))
+        {
+            errorMessage = "No config file was selected.";
+            isLoading = false;
+            return;
+        }
+
+        try
+        {
+            selectedEntry = await DataService.GetCatalogEntryAsync(Path);
+
+            if (selectedEntry is null)
+            {
+                errorMessage = $"The generated config '{Path}' was not found.";
+                return;
+            }
+
+            selectedConfig = await DataService.GetConfigAsync(selectedEntry.OutputFile);
+        }
+        catch (Exception exception)
+        {
+            errorMessage = exception.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private static string DisplayValue(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private static string FormatJson(JsonElement element) =>
+        JsonSerializer.Serialize(element, JsonOptions);
+}

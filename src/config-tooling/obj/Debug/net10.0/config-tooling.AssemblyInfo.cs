@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("config-tooling")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8bd4244fac3b012d359ab4d867f0714d1cf80648")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+47e55d4e044021a0ad7473df332e6d418102bcc6")]
 [assembly: System.Reflection.AssemblyProductAttribute("config-tooling")]
 [assembly: System.Reflection.AssemblyTitleAttribute("config-tooling")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
