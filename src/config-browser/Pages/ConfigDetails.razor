@@ -42,7 +42,7 @@ else
             </div>
 
             <div class="detail-toolbar detail-card detail-card-wide">
-                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!ShouldShowPromoteButton)">Promote</button>
+                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote)">@GetPromoteButtonLabel(selectedEntry)</button>
             </div>
 
             <div class="detail-card detail-card-wide">
@@ -75,8 +75,8 @@ else
                         <dd>@selectedEntry.OutputFile</dd>
                     </div>
                     <div>
-                        <dt>Matching PRD version</dt>
-                        <dd>@GetPrdMatchLabel(selectedEntry)</dd>
+                        <dt>@GetMatchFieldLabel(selectedEntry)</dt>
+                        <dd>@GetMatchFieldValue(selectedEntry)</dd>
                     </div>
                 </dl>
             </div>
@@ -238,10 +238,14 @@ else
             ? "Config Details"
             : $"{selectedEntry.FileName} • {selectedEntry.Tenant}/{selectedEntry.Environment}";
 
-    private bool ShouldShowPromoteButton =>
+    private bool CanPromote =>
         selectedEntry is not null &&
-        string.Equals(selectedEntry.Environment, "uat", StringComparison.OrdinalIgnoreCase) &&
-        selectedEntry.HasMatchingPrdVersion == false;
+        (
+            string.Equals(selectedEntry.Environment, "dev", StringComparison.OrdinalIgnoreCase) &&
+            selectedEntry.HasMatchingUatVersion == false ||
+            string.Equals(selectedEntry.Environment, "uat", StringComparison.OrdinalIgnoreCase) &&
+            selectedEntry.HasMatchingPrdVersion == false
+        );
 
     protected override async Task OnParametersSetAsync()
     {
@@ -282,10 +286,24 @@ else
     private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "—" : value;
 
-    private static string GetPrdMatchLabel(ConfigCatalogEntry entry) =>
-        !string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
-            ? "—"
-            : entry.HasMatchingPrdVersion == true ? "Yes" : "No";
+    private static string GetMatchFieldLabel(ConfigCatalogEntry entry) =>
+        string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase)
+            ? "Matching UAT version"
+            : string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
+                ? "Matching PRD version"
+                : "Matching next version";
+
+    private static string GetMatchFieldValue(ConfigCatalogEntry entry) =>
+        string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase)
+            ? entry.HasMatchingUatVersion == true ? "Yes" : "No"
+            : string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
+                ? entry.HasMatchingPrdVersion == true ? "Yes" : "No"
+                : "—";
+
+    private static string GetPromoteButtonLabel(ConfigCatalogEntry? entry) =>
+        entry is null
+            ? "Promote"
+            : $"Promote to {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}";
 
     private async Task ConfirmPromoteAsync()
     {
@@ -296,8 +314,11 @@ else
 
         await JsRuntime.InvokeAsync<bool>(
             "confirm",
-            $"Promote '{selectedEntry.FileName}' for tenant '{selectedEntry.Tenant}' from UAT to PRD?");
+            $"Promote '{selectedEntry.FileName}' for tenant '{selectedEntry.Tenant}' from {selectedEntry.Environment.ToUpperInvariant()} to {GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()}?");
     }
+
+    private static string GetPromotionTargetEnvironment(ConfigCatalogEntry entry) =>
+        string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase) ? "uat" : "prd";
 
     private static string FormatJson(JsonElement element) =>
         JsonSerializer.Serialize(element, JsonOptions);

@@ -1,18 +1,48 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+
 <div class="app-shell">
-    <header class="app-header">
-        <div class="header-content">
+    <aside class="app-sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-mark">CB</div>
             <div class="brand-block">
                 <div class="brand-row">
                     <a class="brand-link" href="">Config Browser</a>
                     <span class="product-tag">Internal</span>
                 </div>
-                <p class="brand-copy">Browse generated config output by tenant and environment.</p>
+                <p class="brand-copy">Generated configuration workspace</p>
             </div>
         </div>
-    </header>
 
-    <main class="app-main">
-        @Body
-    </main>
+        <div class="sidebar-section">
+            <p class="sidebar-heading">Workspace</p>
+            <NavLink href="" Match="NavLinkMatch.All" class="nav-item">
+                <span class="nav-item-label">Config catalog</span>
+                <span class="nav-item-hint">Browse outputs</span>
+            </NavLink>
+
+            <div class="nav-item @(IsDetailsPage ? "active" : string.Empty)">
+                <span class="nav-item-label">Config details</span>
+                <span class="nav-item-hint">Inspect selected file</span>
+            </div>
+        </div>
+
+        <div class="sidebar-section sidebar-note">
+            <p class="sidebar-heading">Environment</p>
+            <div class="note-card">
+                <strong>Static data browser</strong>
+                <span>Review generated config output, history, and promotion status.</span>
+            </div>
+        </div>
+    </aside>
+
+    <div class="app-workspace">
+        <main class="app-main">
+            @Body
+        </main>
+    </div>
 </div>
+
+@code {
+    private bool IsDetailsPage => NavigationManager.ToBaseRelativePath(NavigationManager.Uri).StartsWith("config", StringComparison.OrdinalIgnoreCase);
+}

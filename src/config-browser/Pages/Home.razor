@@ -1,5 +1,6 @@
-﻿@page "/"
+@page "/"
 @inject ConfigDataService DataService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Config Browser</PageTitle>
 
@@ -55,20 +56,30 @@ else
             <div class="filters-row">
                 <label class="filter-field" for="tenant-filter">
                     <span>Tenant</span>
-                    <select id="tenant-filter" @bind="selectedTenant" @bind:after="EnsureSelectedEnvironmentIsValid">
+                    <select id="tenant-filter" @bind="selectedTenant" @bind:after="EnsureSelectedFiltersAreValid">
                         @foreach (var tenant in TenantOptions)
                         {
-                            <option value="@tenant">@FormatOptionLabel(tenant)</option>
+                            <option value="@tenant">@FormatTenantOrEnvironmentOptionLabel(tenant)</option>
                         }
                     </select>
                 </label>
 
                 <label class="filter-field" for="environment-filter">
                     <span>Environment</span>
-                    <select id="environment-filter" @bind="selectedEnvironment">
+                    <select id="environment-filter" @bind="selectedEnvironment" @bind:after="EnsureSelectedFiltersAreValid">
                         @foreach (var environment in EnvironmentOptions)
                         {
-                            <option value="@environment">@FormatOptionLabel(environment)</option>
+                            <option value="@environment">@FormatTenantOrEnvironmentOptionLabel(environment)</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="filter-field" for="contact-type-filter">
+                    <span>Contact type</span>
+                    <select id="contact-type-filter" @bind="selectedContactType">
+                        @foreach (var contactType in ContactTypeOptions)
+                        {
+                            <option value="@contactType">@FormatContactTypeOptionLabel(contactType)</option>
                         }
                     </select>
                 </label>
@@ -86,7 +97,7 @@ else
             @if (FilteredEntries.Count == 0)
             {
                 <div class="empty-results">
-                    <p>No generated configs match the current tenant and environment selection.</p>
+                    <p>No generated configs match the current filter selection.</p>
                 </div>
             }
             else
@@ -97,22 +108,27 @@ else
                             <tr>
                                 <th>Tenant</th>
                                 <th>Environment</th>
+                                <th>Contact Type</th>
+                                <th>Channel</th>
                                 <th>File</th>
                                 <th>Source</th>
-                                <th>PRD match</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var entry in FilteredEntries)
                             {
-                                <tr>
+                                <tr class="clickable-row"
+                                    @onclick="@(() => OpenDetails(entry))"
+                                    @onkeydown="@((KeyboardEventArgs args) => HandleRowKeyDown(args, entry))"
+                                    tabindex="0">
                                     <td><span class="table-badge">@entry.Tenant</span></td>
                                     <td>@entry.Environment.ToUpperInvariant()</td>
+                                    <td>@entry.ContactType</td>
+                                    <td>@entry.Channel</td>
                                     <td>
-                                        <a class="table-link" href="@BuildDetailsUri(entry)">@entry.FileName</a>
+                                        <span class="table-link">@entry.FileName</span>
                                     </td>
                                     <td><code>@entry.SourceFile</code></td>
-                                    <td>@GetPrdMatchLabel(entry)</td>
                                 </tr>
                             }
                         </tbody>
@@ -131,6 +147,7 @@ else
     private string? errorMessage;
     private string selectedTenant = AllOption;
     private string selectedEnvironment = AllOption;
+    private string selectedContactType = AllOption;
 
     private int ToDisplayOrder(string environmentName) => environmentName.ToLowerInvariant() switch {
         "dev" => 0,
@@ -143,6 +160,7 @@ else
         catalog?.Entries
             .Where(MatchesTenant)
             .Where(MatchesEnvironment)
+            .Where(MatchesContactType)
             .OrderBy(x => x.FileName).ThenBy(x => ToDisplayOrder(x.Environment))
             .ToArray() ?? [];
 
@@ -174,6 +192,26 @@ else
         }
     }
 
+    private IReadOnlyList<string> ContactTypeOptions
+    {
+        get
+        {
+            if (catalog is null)
+            {
+                return [AllOption];
+            }
+
+            var entries = catalog.Entries
+                .Where(MatchesTenant)
+                .Where(MatchesEnvironment);
+
+            return [AllOption, .. entries
+                .Select(static entry => entry.ContactType)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(static value => value, StringComparer.OrdinalIgnoreCase)];
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -193,8 +231,14 @@ else
     private static string BuildDetailsUri(ConfigCatalogEntry entry) =>
         $"config?path={Uri.EscapeDataString(entry.OutputFile)}";
 
-    private static string FormatOptionLabel(string value) =>
+    private void OpenDetails(ConfigCatalogEntry entry) =>
+        NavigationManager.NavigateTo(BuildDetailsUri(entry));
+
+    private static string FormatTenantOrEnvironmentOptionLabel(string value) =>
         value == AllOption ? "All" : value.ToUpperInvariant();
+
+    private static string FormatContactTypeOptionLabel(string value) =>
+        value == AllOption ? "All" : value;
 
     private bool MatchesTenant(ConfigCatalogEntry entry) =>
         selectedTenant == AllOption ||
@@ -204,11 +248,28 @@ else
         selectedEnvironment == AllOption ||
         string.Equals(entry.Environment, selectedEnvironment, StringComparison.OrdinalIgnoreCase);
 
-    private void EnsureSelectedEnvironmentIsValid()
+    private bool MatchesContactType(ConfigCatalogEntry entry) =>
+        selectedContactType == AllOption ||
+        string.Equals(entry.ContactType, selectedContactType, StringComparison.OrdinalIgnoreCase);
+
+    private void EnsureSelectedFiltersAreValid()
     {
         if (!EnvironmentOptions.Contains(selectedEnvironment, StringComparer.OrdinalIgnoreCase))
         {
             selectedEnvironment = AllOption;
+        }
+
+        if (!ContactTypeOptions.Contains(selectedContactType, StringComparer.OrdinalIgnoreCase))
+        {
+            selectedContactType = AllOption;
+        }
+    }
+
+    private void HandleRowKeyDown(KeyboardEventArgs args, ConfigCatalogEntry entry)
+    {
+        if (args.Key is "Enter" or " ")
+        {
+            OpenDetails(entry);
         }
     }
 

@@ -1,4 +1,6 @@
 ﻿using System.Text.Json;
+using System.Threading.Channels;
+using System.Xml.Schema;
 
 internal sealed class ConfigToolingApp
 {
@@ -32,7 +34,7 @@ internal sealed class ConfigToolingApp
         }
 
         var jsonFiles = Directory
-            .EnumerateFiles(options.SourceDirectory, "*.json", SearchOption.TopDirectoryOnly)
+            .EnumerateFiles(options.SourceDirectory, "*.json", SearchOption.AllDirectories)
             .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
@@ -66,42 +68,41 @@ internal sealed class ConfigToolingApp
         ICollection<FileHistory> fileHistories)
     {
         var fileContents = await File.ReadAllTextAsync(filePath);
-        var config = DeserializeConfig(filePath, fileContents);
+        var config = System.Text.Json.JsonSerializer.Deserialize<Config>(fileContents);
         var relativeSourceFile = Path.GetRelativePath(options.RepositoryRoot, filePath);
         var modifications = await _gitHistoryService.GetFileHistoryAsync(relativeSourceFile);
         var copiesCreated = 0;
 
-        foreach (var featureFlag in config.GetEnabledFeatureFlags())
+        var pathtokens = Path.GetRelativePath(options.SourceDirectory, filePath).Split(System.IO.Path.DirectorySeparatorChar);
+        var tenant = pathtokens[0];
+        var environment = pathtokens[1];
+    
+        var outputFilePath = Path.Combine(
+            options.DestinationRoot,
+            tenant,
+            environment,
+            Path.GetFileName(filePath));
+
+        Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
+        Console.WriteLine($" - {outputFilePath}");
+        await File.WriteAllTextAsync(outputFilePath, fileContents);
+
+        fileHistories.Add(new FileHistory
         {
-            foreach (var environment in EnvironmentResolver.Resolve(featureFlag.Environments))
-            {
-                var outputFilePath = Path.Combine(
-                    options.DestinationRoot,
-                    featureFlag.Tenant,
-                    environment,
-                    Path.GetFileName(filePath));
+            OutputFile = Path.GetRelativePath(options.DestinationRoot, outputFilePath),
+            SourceFile = relativeSourceFile,
+            Modifications = modifications.ToList(),
+            ContactType = config.trigger,
+            Channel = config.channel
+            
+        });
 
-                Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath)!);
-                Console.WriteLine($" - {outputFilePath}");
-                await File.WriteAllTextAsync(outputFilePath, fileContents);
-
-                fileHistories.Add(new FileHistory
-                {
-                    OutputFile = Path.GetRelativePath(options.DestinationRoot, outputFilePath),
-                    SourceFile = relativeSourceFile,
-                    Modifications = modifications.ToList()
-                });
-
-                copiesCreated++;
-            }
-        }
+        copiesCreated++;
+            
+        
 
         return copiesCreated;
     }
-
-    private static ConfigFile DeserializeConfig(string filePath, string fileContents) =>
-        JsonSerializer.Deserialize<ConfigFile>(fileContents, JsonOptions)
-        ?? throw new InvalidOperationException($"Unable to deserialize config file '{filePath}'.");
 
     private static void ResetDestinationRoot(string destinationRoot)
     {

@@ -68,13 +68,5 @@
         "expression": "Context.Input['creditLimitPreference'].Is('0')",
         "description": "Send communication if creditLimitPreference is 0"
     },
-    "featureFlags": [
-        {
-            "tenant": "ndc",
-            "enabled": true,
-            "environments": [
-                "all"
-            ]
-        }
-    ]
+    "enabled": "true"
 }

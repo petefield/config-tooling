@@ -46,7 +46,7 @@ internal sealed class ConfigDataService
             .Select(MapToCatalogEntry)
             .ToArray();
 
-        await ApplyMatchingPrdFlagsAsync(entries);
+        await ApplyMatchingEnvironmentFlagsAsync(entries);
 
         _catalog = new ConfigCatalog
         {
@@ -86,7 +86,7 @@ internal sealed class ConfigDataService
         return config;
     }
 
-    private async Task ApplyMatchingPrdFlagsAsync(ConfigCatalogEntry[] entries)
+    private async Task ApplyMatchingEnvironmentFlagsAsync(ConfigCatalogEntry[] entries)
     {
         var updatedEntries = new List<ConfigCatalogEntry>(entries.Length);
         var entriesByKey = entries.ToDictionary(
@@ -95,23 +95,39 @@ internal sealed class ConfigDataService
 
         foreach (var entry in entries)
         {
-            if (!string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase))
+            var updatedEntry = entry;
+
+            if (string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase))
             {
-                updatedEntries.Add(entry);
-                continue;
+                var uatKey = BuildTenantFileKey(entry.Tenant, entry.FileName, "uat");
+                var hasMatchingUatVersion = false;
+
+                if (entriesByKey.TryGetValue(uatKey, out var uatEntry))
+                {
+                    var devConfig = await GetRawConfigAsync(entry.OutputFile);
+                    var uatConfig = await GetRawConfigAsync(uatEntry.OutputFile);
+                    hasMatchingUatVersion = string.Equals(devConfig, uatConfig, StringComparison.Ordinal);
+                }
+
+                updatedEntry = updatedEntry with { HasMatchingUatVersion = hasMatchingUatVersion };
             }
 
-            var prdKey = BuildTenantFileKey(entry.Tenant, entry.FileName, "prd");
-            var hasMatchingPrdVersion = false;
-
-            if (entriesByKey.TryGetValue(prdKey, out var prdEntry))
+            if (string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase))
             {
-                var uatConfig = await GetRawConfigAsync(entry.OutputFile);
-                var prdConfig = await GetRawConfigAsync(prdEntry.OutputFile);
-                hasMatchingPrdVersion = string.Equals(uatConfig, prdConfig, StringComparison.Ordinal);
+                var prdKey = BuildTenantFileKey(entry.Tenant, entry.FileName, "prd");
+                var hasMatchingPrdVersion = false;
+
+                if (entriesByKey.TryGetValue(prdKey, out var prdEntry))
+                {
+                    var uatConfig = await GetRawConfigAsync(entry.OutputFile);
+                    var prdConfig = await GetRawConfigAsync(prdEntry.OutputFile);
+                    hasMatchingPrdVersion = string.Equals(uatConfig, prdConfig, StringComparison.Ordinal);
+                }
+
+                updatedEntry = updatedEntry with { HasMatchingPrdVersion = hasMatchingPrdVersion };
             }
 
-            updatedEntries.Add(entry with { HasMatchingPrdVersion = hasMatchingPrdVersion });
+            updatedEntries.Add(updatedEntry);
         }
 
         for (var index = 0; index < entries.Length; index++)
@@ -191,6 +207,8 @@ internal sealed class ConfigDataService
         {
             OutputFile = entry.OutputFile,
             SourceFile = entry.SourceFile,
+            ContactType = entry.ContactType,
+            Channel = entry.Channel,
             Tenant = segments[0],
             Environment = segments[1],
             FileName = segments[^1],

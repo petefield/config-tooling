@@ -1,25 +1,42 @@
 .app-shell {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
     min-height: 100vh;
 }
 
-.app-header {
-    border-bottom: 1px solid #114a99;
-    background: linear-gradient(90deg, #0f5cc0 0%, #1b74d4 100%);
-    box-shadow: 0 6px 18px rgba(15, 92, 192, 0.18);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+.app-sidebar {
+    background: linear-gradient(180deg, #132a46 0%, #19385f 100%);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    color: #e8f0fb;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1.5rem 1.25rem;
 }
 
-.header-content {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 0.95rem 1.5rem;
+.sidebar-brand {
+    align-items: center;
+    display: flex;
+    gap: 0.9rem;
+}
+
+.brand-mark {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 16px;
+    color: #ffffff;
+    display: flex;
+    font-size: 0.95rem;
+    font-weight: 800;
+    height: 3rem;
+    justify-content: center;
+    width: 3rem;
 }
 
 .brand-block {
     display: grid;
-    gap: 0.35rem;
+    gap: 0.25rem;
 }
 
 .brand-row {
@@ -31,7 +48,7 @@
 .brand-link {
     color: #ffffff;
     display: inline-block;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-decoration: none;
@@ -54,12 +71,101 @@
 }
 
 .brand-copy {
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(232, 240, 251, 0.76);
+    font-size: 0.9rem;
     margin: 0;
 }
 
+.sidebar-section {
+    display: grid;
+    gap: 0.6rem;
+}
+
+.sidebar-heading {
+    color: rgba(232, 240, 251, 0.68);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.nav-item {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    color: #f7fbff;
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.8rem 0.9rem;
+    text-decoration: none;
+}
+
+.nav-item.active,
+.nav-item.active:link,
+.nav-item.active:visited,
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.nav-item-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.nav-item-hint {
+    color: rgba(232, 240, 251, 0.68);
+    font-size: 0.8rem;
+}
+
+.sidebar-note {
+    margin-top: auto;
+}
+
+.note-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    display: grid;
+    gap: 0.35rem;
+    padding: 1rem;
+}
+
+.note-card strong {
+    color: #ffffff;
+    font-size: 0.92rem;
+}
+
+.note-card span {
+    color: rgba(232, 240, 251, 0.72);
+    font-size: 0.84rem;
+}
+
+.app-workspace {
+    min-width: 0;
+    padding: 1.5rem;
+}
+
 .app-main {
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 1.5rem 1.5rem 2.5rem;
+    max-width: 1320px;
+}
+
+@media (max-width: 960px) {
+    .app-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .app-sidebar {
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .sidebar-note {
+        margin-top: 0;
+    }
+
+    .app-workspace {
+        padding: 1rem;
+    }
 }

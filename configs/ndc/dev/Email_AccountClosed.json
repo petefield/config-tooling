@@ -2,7 +2,7 @@
     "operationUnit": "atc",
     "connector": "Salesforce",
     "channel": "email",
-    "trigger": "Testing",
+    "trigger": "ProactiveLimitIncreaseCompleted",
     "outputType": "JSON",
     "inputData": [
         {
@@ -68,13 +68,5 @@
         "expression": "Context.Input['creditLimitPreference'].Is('0')",
         "description": "Send communication if creditLimitPreference is 0"
     },
-    "featureFlags": [
-        {
-            "tenant": "ndc",
-            "enabled": true,
-            "environments": [
-                "dev"
-            ]
-        }
-    ]
+    "enabled": "true"
 }

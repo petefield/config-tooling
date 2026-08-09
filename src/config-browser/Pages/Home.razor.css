@@ -167,8 +167,18 @@
     transition: background 0.15s ease;
 }
 
+.results-table tbody tr.clickable-row {
+    cursor: pointer;
+}
+
 .results-table tbody tr:hover {
     background: #f4f8fc;
+}
+
+.results-table tbody tr.clickable-row:focus-visible {
+    background: #eef5fb;
+    outline: 2px solid #3d8be8;
+    outline-offset: -2px;
 }
 
 .results-table td {
