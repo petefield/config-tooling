@@ -7,7 +7,10 @@ namespace config_browser.Services;
 
 internal sealed class ConfigDataService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
     private readonly Dictionary<string, ConfigDocument> _configCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _rawConfigCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly HttpClient _httpClient;
 
     private ConfigCatalog? _catalog;
@@ -39,11 +42,16 @@ internal sealed class ConfigDataService
                 "The generated history index is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.")
             ?? throw new InvalidOperationException("The generated history index could not be read.");
 
+        var entries = historyIndex.Files
+            .Select(MapToCatalogEntry)
+            .ToArray();
+
+        await ApplyMatchingPrdFlagsAsync(entries);
+
         _catalog = new ConfigCatalog
         {
             GeneratedAtUtc = historyIndex.GeneratedAtUtc,
-            Entries = historyIndex.Files
-                .Select(MapToCatalogEntry)
+            Entries = entries
                 .OrderBy(static entry => entry.Tenant, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(static entry => entry.Environment, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(static entry => entry.FileName, StringComparer.OrdinalIgnoreCase)
@@ -68,11 +76,9 @@ internal sealed class ConfigDataService
             return cachedDocument;
         }
 
-        using var response = await _httpClient.GetAsync(BuildDataPath(outputFile));
-        response.EnsureSuccessStatusCode();
-
-        var config = await ReadJsonAsync<ConfigDocument>(
-                response,
+        var rawConfig = await GetRawConfigAsync(outputFile);
+        var config = DeserializeJson<ConfigDocument>(
+                rawConfig,
                 $"The generated config '{outputFile}' is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.")
             ?? throw new InvalidOperationException($"The generated config '{outputFile}' could not be read.");
 
@@ -80,8 +86,67 @@ internal sealed class ConfigDataService
         return config;
     }
 
+    private async Task ApplyMatchingPrdFlagsAsync(ConfigCatalogEntry[] entries)
+    {
+        var updatedEntries = new List<ConfigCatalogEntry>(entries.Length);
+        var entriesByKey = entries.ToDictionary(
+            static entry => BuildTenantFileKey(entry.Tenant, entry.FileName, entry.Environment),
+            StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in entries)
+        {
+            if (!string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase))
+            {
+                updatedEntries.Add(entry);
+                continue;
+            }
+
+            var prdKey = BuildTenantFileKey(entry.Tenant, entry.FileName, "prd");
+            var hasMatchingPrdVersion = false;
+
+            if (entriesByKey.TryGetValue(prdKey, out var prdEntry))
+            {
+                var uatConfig = await GetRawConfigAsync(entry.OutputFile);
+                var prdConfig = await GetRawConfigAsync(prdEntry.OutputFile);
+                hasMatchingPrdVersion = string.Equals(uatConfig, prdConfig, StringComparison.Ordinal);
+            }
+
+            updatedEntries.Add(entry with { HasMatchingPrdVersion = hasMatchingPrdVersion });
+        }
+
+        for (var index = 0; index < entries.Length; index++)
+        {
+            entries[index] = updatedEntries[index];
+        }
+    }
+
+    private async Task<string> GetRawConfigAsync(string outputFile)
+    {
+        if (_rawConfigCache.TryGetValue(outputFile, out var cachedConfig))
+        {
+            return cachedConfig;
+        }
+
+        using var response = await _httpClient.GetAsync(BuildDataPath(outputFile));
+        response.EnsureSuccessStatusCode();
+
+        var rawConfig = await response.Content.ReadAsStringAsync();
+
+        if (string.IsNullOrWhiteSpace(rawConfig))
+        {
+            throw new InvalidOperationException(
+                $"The generated config '{outputFile}' is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.");
+        }
+
+        _rawConfigCache[outputFile] = rawConfig;
+        return rawConfig;
+    }
+
     private static string BuildDataPath(string outputFile) =>
         $"data/{string.Join("/", outputFile.Split('/').Select(Uri.EscapeDataString))}";
+
+    private static string BuildTenantFileKey(string tenant, string fileName, string environment) =>
+        $"{tenant}/{environment}/{fileName}";
 
     private static async Task<T?> ReadJsonAsync<T>(HttpResponseMessage response, string invalidJsonMessage)
     {
@@ -93,6 +158,18 @@ internal sealed class ConfigDataService
         try
         {
             return await response.Content.ReadFromJsonAsync<T>();
+        }
+        catch (JsonException exception)
+        {
+            throw new InvalidOperationException(invalidJsonMessage, exception);
+        }
+    }
+
+    private static T? DeserializeJson<T>(string json, string invalidJsonMessage)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<T>(json, JsonOptions);
         }
         catch (JsonException exception)
         {

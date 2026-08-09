@@ -49,29 +49,31 @@ else
     </section>
 
     <section class="browser-grid">
-        <aside class="filters-card">
+        <section class="filters-card">
             <h2>Filters</h2>
 
-            <label class="filter-field" for="tenant-filter">
-                <span>Tenant</span>
-                <select id="tenant-filter" @bind="selectedTenant" @bind:after="EnsureSelectedEnvironmentIsValid">
-                    @foreach (var tenant in TenantOptions)
-                    {
-                        <option value="@tenant">@FormatOptionLabel(tenant)</option>
-                    }
-                </select>
-            </label>
+            <div class="filters-row">
+                <label class="filter-field" for="tenant-filter">
+                    <span>Tenant</span>
+                    <select id="tenant-filter" @bind="selectedTenant" @bind:after="EnsureSelectedEnvironmentIsValid">
+                        @foreach (var tenant in TenantOptions)
+                        {
+                            <option value="@tenant">@FormatOptionLabel(tenant)</option>
+                        }
+                    </select>
+                </label>
 
-            <label class="filter-field" for="environment-filter">
-                <span>Environment</span>
-                <select id="environment-filter" @bind="selectedEnvironment">
-                    @foreach (var environment in EnvironmentOptions)
-                    {
-                        <option value="@environment">@FormatOptionLabel(environment)</option>
-                    }
-                </select>
-            </label>
-        </aside>
+                <label class="filter-field" for="environment-filter">
+                    <span>Environment</span>
+                    <select id="environment-filter" @bind="selectedEnvironment">
+                        @foreach (var environment in EnvironmentOptions)
+                        {
+                            <option value="@environment">@FormatOptionLabel(environment)</option>
+                        }
+                    </select>
+                </label>
+            </div>
+        </section>
 
         <section class="results-card">
             <div class="results-header">
@@ -97,6 +99,7 @@ else
                                 <th>Environment</th>
                                 <th>File</th>
                                 <th>Source</th>
+                                <th>PRD match</th>
                                 <th>Last change</th>
                             </tr>
                         </thead>
@@ -110,6 +113,7 @@ else
                                         <a class="table-link" href="@BuildDetailsUri(entry)">@entry.FileName</a>
                                     </td>
                                     <td><code>@entry.SourceFile</code></td>
+                                    <td>@GetPrdMatchLabel(entry)</td>
                                     <td>@GetLastChangeSummary(entry)</td>
                                 </tr>
                             }
@@ -210,4 +214,9 @@ else
             ? "No git history found"
             : $"{lastChange.Message} • {lastChange.AuthorDate.ToLocalTime():g}";
     }
+
+    private static string GetPrdMatchLabel(ConfigCatalogEntry entry) =>
+        !string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
+            ? "—"
+            : entry.HasMatchingPrdVersion == true ? "Yes" : "No";
 }

@@ -74,6 +74,10 @@ else
                         <dt>Generated file</dt>
                         <dd>@selectedEntry.OutputFile</dd>
                     </div>
+                    <div>
+                        <dt>Matching PRD version</dt>
+                        <dd>@GetPrdMatchLabel(selectedEntry)</dd>
+                    </div>
                 </dl>
             </div>
 
@@ -172,7 +176,7 @@ else
                 }
             </div>
 
-            <div class="detail-card">
+            <div class="detail-card detail-card-wide">
                 <div class="section-heading">
                     <h2>Git history</h2>
                     <span>@selectedEntry.Modifications.Count commit(s)</span>
@@ -184,16 +188,29 @@ else
                 }
                 else
                 {
-                    <ol class="history-list">
-                        @foreach (var modification in selectedEntry.Modifications)
-                        {
-                            <li>
-                                <strong>@modification.Message</strong>
-                                <span>@modification.AuthorName · @modification.AuthorDate.ToLocalTime():g</span>
-                                <code>@modification.Commit[..8]</code>
-                            </li>
-                        }
-                    </ol>
+                    <div class="table-wrap">
+                        <table class="detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Message</th>
+                                    <th>Author</th>
+                                    <th>Date</th>
+                                    <th>Commit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var modification in selectedEntry.Modifications)
+                                {
+                                    <tr>
+                                        <td class="history-message-cell">@modification.Message</td>
+                                        <td>@modification.AuthorName</td>
+                                        <td>@modification.AuthorDate.ToLocalTime():g</td>
+                                        <td><code>@modification.Commit[..8]</code></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 }
             </div>
 
@@ -273,6 +290,11 @@ else
 
     private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private static string GetPrdMatchLabel(ConfigCatalogEntry entry) =>
+        !string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
+            ? "—"
+            : entry.HasMatchingPrdVersion == true ? "Yes" : "No";
 
     private static string FormatJson(JsonElement element) =>
         JsonSerializer.Serialize(element, JsonOptions);

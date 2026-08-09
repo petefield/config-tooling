@@ -19,6 +19,8 @@ internal sealed record ConfigCatalogEntry
 
     public required string FileName { get; init; }
 
+    public bool? HasMatchingPrdVersion { get; init; }
+
     public IReadOnlyList<GitModification> Modifications { get; init; } = [];
 }
 

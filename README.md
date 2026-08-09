@@ -26,3 +26,17 @@ A standalone Blazor WebAssembly browser app lives in `src/config-browser`.
 2. Start the browser app from `src/config-browser` with `dotnet run`.
 
 The GitHub Pages workflow copies `src/config-tooling/root` into the published browser site's `wwwroot/data` folder, then deploys that artifact. The browser app lets you filter by tenant and environment, browse the generated files, and open a detail page for each config.
+
+For local Windows testing, run:
+
+```bat
+refresh-browser-data.bat
+```
+
+For local bash testing, run:
+
+```bash
+./refresh-browser-data.sh
+```
+
+Both scripts run the tooling project, clear `src/config-browser/wwwroot/data`, and copy the latest generated output into it.

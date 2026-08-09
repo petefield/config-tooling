@@ -75,13 +75,6 @@
             "environments": [
                 "all"
             ]
-        },
-        {
-            "tenant": "a05",
-            "enabled": true,
-            "environments": [
-                "all"
-            ]
         }
     ]
 }

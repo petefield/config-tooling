@@ -1,30 +1,44 @@
 {
-  "GeneratedAtUtc": "2026-08-09T09:09:19.9822466+00:00",
+  "GeneratedAtUtc": "2026-08-09T16:24:18.2396313+00:00",
   "Files": [
     {
       "OutputFile": "ndc/dev/Email_AccountClosed.json",
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "16d7ee2b22ca9b863c2cc2c6dd715a153bfac5f6",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:50:35+01:00",
+          "Message": "use all for env flags"
+        },
+        {
+          "Commit": "aa080b9b73b1d60d687edf4281342d466b26a404",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:45:22+01:00",
+          "Message": "move email to prod"
+        },
+        {
+          "Commit": "15422b8b27d3a58f386dacbeed61903d268d50c9",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:34:45+01:00",
+          "Message": "move email account closed to uat"
+        },
+        {
+          "Commit": "6bb8ec431f578af1bc83da4e7e614819541175eb",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:21:39+01:00",
+          "Message": "Update Email_AccountClosed.json configuration"
+        },
+        {
           "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
           "AuthorDate": "2026-08-09T09:40:37+01:00",
           "Message": "add browser"
-        },
-        {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
-        },
-        {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
         }
       ]
     },
@@ -33,25 +47,39 @@
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
+          "Commit": "16d7ee2b22ca9b863c2cc2c6dd715a153bfac5f6",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:50:35+01:00",
+          "Message": "use all for env flags"
+        },
+        {
+          "Commit": "aa080b9b73b1d60d687edf4281342d466b26a404",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:45:22+01:00",
+          "Message": "move email to prod"
+        },
+        {
+          "Commit": "15422b8b27d3a58f386dacbeed61903d268d50c9",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:34:45+01:00",
+          "Message": "move email account closed to uat"
+        },
+        {
+          "Commit": "6bb8ec431f578af1bc83da4e7e614819541175eb",
+          "AuthorName": "petefield",
+          "AuthorEmail": "pete.field@gmail.com",
+          "AuthorDate": "2026-08-09T10:21:39+01:00",
+          "Message": "Update Email_AccountClosed.json configuration"
+        },
+        {
           "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
           "AuthorDate": "2026-08-09T09:40:37+01:00",
           "Message": "add browser"
-        },
-        {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
-        },
-        {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
         }
       ]
     },
@@ -60,106 +88,39 @@
       "SourceFile": "configs/Email_AccountClosed.json",
       "Modifications": [
         {
-          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
-          "AuthorName": "Pete",
+          "Commit": "16d7ee2b22ca9b863c2cc2c6dd715a153bfac5f6",
+          "AuthorName": "petefield",
           "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T09:40:37+01:00",
-          "Message": "add browser"
+          "AuthorDate": "2026-08-09T10:50:35+01:00",
+          "Message": "use all for env flags"
         },
         {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
+          "Commit": "aa080b9b73b1d60d687edf4281342d466b26a404",
+          "AuthorName": "petefield",
           "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
+          "AuthorDate": "2026-08-09T10:45:22+01:00",
+          "Message": "move email to prod"
         },
         {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
+          "Commit": "15422b8b27d3a58f386dacbeed61903d268d50c9",
+          "AuthorName": "petefield",
           "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
-        }
-      ]
-    },
-    {
-      "OutputFile": "a05/dev/Email_AccountClosed.json",
-      "SourceFile": "configs/Email_AccountClosed.json",
-      "Modifications": [
-        {
-          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T09:40:37+01:00",
-          "Message": "add browser"
+          "AuthorDate": "2026-08-09T10:34:45+01:00",
+          "Message": "move email account closed to uat"
         },
         {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
+          "Commit": "6bb8ec431f578af1bc83da4e7e614819541175eb",
+          "AuthorName": "petefield",
           "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
+          "AuthorDate": "2026-08-09T10:21:39+01:00",
+          "Message": "Update Email_AccountClosed.json configuration"
         },
-        {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
-        }
-      ]
-    },
-    {
-      "OutputFile": "a05/uat/Email_AccountClosed.json",
-      "SourceFile": "configs/Email_AccountClosed.json",
-      "Modifications": [
         {
           "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
           "AuthorName": "Pete",
           "AuthorEmail": "pete.field@gmail.com",
           "AuthorDate": "2026-08-09T09:40:37+01:00",
           "Message": "add browser"
-        },
-        {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
-        },
-        {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
-        }
-      ]
-    },
-    {
-      "OutputFile": "a05/prd/Email_AccountClosed.json",
-      "SourceFile": "configs/Email_AccountClosed.json",
-      "Modifications": [
-        {
-          "Commit": "840ce32f72fcf5d5afa9689aa5373adc6e6f32d0",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T09:40:37+01:00",
-          "Message": "add browser"
-        },
-        {
-          "Commit": "47e55d4e044021a0ad7473df332e6d418102bcc6",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:46:10+01:00",
-          "Message": "move email to prod a05"
-        },
-        {
-          "Commit": "c3406547239e683166a32dfacb600d71603437ad",
-          "AuthorName": "Pete",
-          "AuthorEmail": "pete.field@gmail.com",
-          "AuthorDate": "2026-08-09T06:44:43+01:00",
-          "Message": "Initial"
         }
       ]
     },

@@ -7,10 +7,10 @@
 .details-hero,
 .detail-card,
 .state-card {
-    background: rgba(15, 23, 42, 0.72);
-    border: 1px solid rgba(148, 163, 184, 0.18);
-    border-radius: 24px;
-    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    background: #ffffff;
+    border: 1px solid #d8e2ee;
+    border-radius: 12px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .details-hero,
@@ -20,19 +20,19 @@
 }
 
 .back-link {
-    color: #93c5fd;
+    color: #1f5fbf;
     text-decoration: none;
 }
 
 .back-link:hover {
-    color: #dbeafe;
+    color: #144788;
 }
 
 .eyebrow {
-    color: #93c5fd;
-    font-size: 0.82rem;
+    color: #5d7691;
+    font-size: 0.74rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     margin: 0 0 0.5rem;
     text-transform: uppercase;
 }
@@ -40,15 +40,33 @@
 .details-hero h1,
 .detail-card h2,
 .state-card h1 {
+    color: #19324d;
+    font-size: 1.05rem;
     margin-top: 0;
+}
+
+.details-hero h1,
+.state-card h1 {
+    font-size: 1.6rem;
 }
 
 .hero-copy,
 .section-empty,
 .condition-description,
 .state-card p {
-    color: #cbd5e1;
+    color: #64788f;
     margin-bottom: 0;
+}
+
+.details-hero {
+    background: linear-gradient(135deg, #1f66c7 0%, #3d8be8 100%);
+    border-color: #2c78d5;
+}
+
+.details-hero h1,
+.details-hero .hero-copy,
+.details-hero .eyebrow {
+    color: #ffffff;
 }
 
 .hero-tags {
@@ -59,11 +77,11 @@
 }
 
 .hero-tags span {
-    background: rgba(59, 130, 246, 0.16);
-    border: 1px solid rgba(96, 165, 250, 0.28);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 999px;
-    color: #bfdbfe;
-    padding: 0.45rem 0.85rem;
+    color: #ffffff;
+    padding: 0.35rem 0.7rem;
 }
 
 .details-grid {
@@ -85,11 +103,14 @@
 
 .overview-grid dt,
 .section-heading span {
-    color: #94a3b8;
-    font-size: 0.85rem;
+    color: #5f738a;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .overview-grid dd {
+    color: #203247;
     margin: 0.25rem 0 0;
     word-break: break-word;
 }
@@ -100,8 +121,9 @@
 }
 
 .pill-card {
-    background: rgba(30, 41, 59, 0.74);
-    border-radius: 18px;
+    background: #f7fafe;
+    border: 1px solid #d7e3f0;
+    border-radius: 10px;
     display: grid;
     gap: 0.25rem;
     padding: 1rem;
@@ -109,7 +131,7 @@
 
 .pill-card span,
 .pill-card small {
-    color: #cbd5e1;
+    color: #64788f;
 }
 
 .section-heading {
@@ -120,47 +142,50 @@
 }
 
 .table-wrap {
+    border: 1px solid #d3deeb;
+    border-radius: 10px;
     overflow-x: auto;
 }
 
 .detail-table {
     border-collapse: collapse;
+    background: #ffffff;
     width: 100%;
 }
 
 .detail-table th,
 .detail-table td {
-    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-    padding: 0.9rem 0.75rem;
+    border-bottom: 1px solid #e4ebf3;
+    padding: 0.8rem 0.8rem;
     text-align: left;
     vertical-align: top;
 }
 
 .detail-table th {
-    color: #94a3b8;
-    font-size: 0.85rem;
+    background: #eef5fb;
+    color: #526980;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.detail-table td {
+    color: #203247;
+}
+
+.detail-table code {
+    color: #49627e;
+}
+
+.history-message-cell {
     font-weight: 600;
 }
 
-.history-list {
-    display: grid;
-    gap: 1rem;
-    margin: 0;
-    padding-left: 1.25rem;
-}
-
-.history-list li {
-    display: grid;
-    gap: 0.25rem;
-}
-
-.history-list span {
-    color: #cbd5e1;
-}
-
 .json-section {
-    background: rgba(30, 41, 59, 0.74);
-    border-radius: 18px;
+    background: #f7fafe;
+    border: 1px solid #d7e3f0;
+    border-radius: 10px;
     margin-top: 0.75rem;
     padding: 0.9rem 1rem;
 }
@@ -172,8 +197,9 @@
 
 .json-section pre,
 .detail-card pre {
-    background: rgba(15, 23, 42, 0.9);
-    border-radius: 16px;
+    background: #f2f7fc;
+    border: 1px solid #d7e3f0;
+    border-radius: 10px;
     margin: 0.75rem 0 0;
     overflow-x: auto;
     padding: 1rem;
@@ -182,7 +208,7 @@
 }
 
 .error-state {
-    border-color: rgba(248, 113, 113, 0.35);
+    border-color: #e0b9bf;
 }
 
 @media (max-width: 900px) {
