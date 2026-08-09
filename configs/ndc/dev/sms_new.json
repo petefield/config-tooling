@@ -17,16 +17,6 @@
             "required": true
         },
         {
-            "name": "fromLimit",
-            "type": "string",
-            "path": "$.limitChange.fromLimit"
-        },
-        {
-            "name": "toLimit",
-            "type": "string",
-            "path": "$.limitChange.toLimit"
-        },
-        {
             "name": "creditLimitPreference",
             "type": "string",
             "path": "$.limitChange.creditLimitPreference"
