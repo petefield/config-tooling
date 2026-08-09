@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "md5Tv2oIP1k=",
+  "dgSpecHash": "rV71Z0gIO0E=",
   "success": true,
   "projectFilePath": "/home/pete/Source/config-tooling/config-tooling/src/config-browser/config-browser.csproj",
   "expectedPackageFiles": [
@@ -13,7 +13,6 @@
     "/home/pete/.nuget/packages/microsoft.aspnetcore.components.webassembly/10.0.7/microsoft.aspnetcore.components.webassembly.10.0.7.nupkg.sha512",
     "/home/pete/.nuget/packages/microsoft.aspnetcore.components.webassembly.devserver/10.0.7/microsoft.aspnetcore.components.webassembly.devserver.10.0.7.nupkg.sha512",
     "/home/pete/.nuget/packages/microsoft.aspnetcore.metadata/10.0.7/microsoft.aspnetcore.metadata.10.0.7.nupkg.sha512",
-    "/home/pete/.nuget/packages/microsoft.dotnet.hotreload.webassembly.browser/10.0.107/microsoft.dotnet.hotreload.webassembly.browser.10.0.107.nupkg.sha512",
     "/home/pete/.nuget/packages/microsoft.extensions.configuration/10.0.7/microsoft.extensions.configuration.10.0.7.nupkg.sha512",
     "/home/pete/.nuget/packages/microsoft.extensions.configuration.abstractions/10.0.7/microsoft.extensions.configuration.abstractions.10.0.7.nupkg.sha512",
     "/home/pete/.nuget/packages/microsoft.extensions.configuration.binder/10.0.7/microsoft.extensions.configuration.binder.10.0.7.nupkg.sha512",
