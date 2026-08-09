@@ -138,6 +138,7 @@ else
         catalog?.Entries
             .Where(MatchesTenant)
             .Where(MatchesEnvironment)
+            .OrderBy(x => x.FileName).ThenBy(x => x.Environment)
             .ToArray() ?? [];
 
     private IReadOnlyList<string> TenantOptions =>
