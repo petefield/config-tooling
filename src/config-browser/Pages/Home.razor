@@ -100,7 +100,6 @@ else
                                 <th>File</th>
                                 <th>Source</th>
                                 <th>PRD match</th>
-                                <th>Last change</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -114,7 +113,6 @@ else
                                     </td>
                                     <td><code>@entry.SourceFile</code></td>
                                     <td>@GetPrdMatchLabel(entry)</td>
-                                    <td>@GetLastChangeSummary(entry)</td>
                                 </tr>
                             }
                         </tbody>
@@ -134,11 +132,18 @@ else
     private string selectedTenant = AllOption;
     private string selectedEnvironment = AllOption;
 
+    private int ToDisplayOrder(string environmentName) => environmentName.ToLowerInvariant() switch {
+        "dev" => 0,
+        "uat" => 1,
+        "prd" => 2,
+        _ => 3
+    };
+
     private IReadOnlyList<ConfigCatalogEntry> FilteredEntries =>
         catalog?.Entries
             .Where(MatchesTenant)
             .Where(MatchesEnvironment)
-            .OrderBy(x => x.FileName).ThenBy(x => x.Environment)
+            .OrderBy(x => x.FileName).ThenBy(x => ToDisplayOrder(x.Environment))
             .ToArray() ?? [];
 
     private IReadOnlyList<string> TenantOptions =>

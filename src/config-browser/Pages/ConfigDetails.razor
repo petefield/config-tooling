@@ -1,6 +1,7 @@
-﻿@page "/config"
+@page "/config"
 @using System.Text.Json
 @inject ConfigDataService DataService
+@inject IJSRuntime JsRuntime
 
 <PageTitle>@PageTitleText</PageTitle>
 
@@ -32,23 +33,22 @@ else
     <div class="details-shell">
         <a class="back-link" href="">← Back to config list</a>
 
-        <section class="details-hero">
-            <div>
-                <p class="eyebrow">@selectedEntry.Tenant / @selectedEntry.Environment.ToUpperInvariant()</p>
-                <h1>@selectedEntry.FileName</h1>
-                <p class="hero-copy">@selectedEntry.SourceFile</p>
-            </div>
-
-            <div class="hero-tags">
-                <span>@selectedConfig.Channel ?? "Unknown channel"</span>
-                <span>@selectedConfig.Trigger ?? "Unknown trigger"</span>
-                <span>@selectedConfig.Connector ?? "Unknown connector"</span>
-            </div>
-        </section>
-
         <section class="details-grid">
-            <div class="detail-card">
-                <h2>Overview</h2>
+            <div class="detail-card detail-card-wide title-card">
+                <div class="toolbar-title">
+                    <p class="eyebrow">@selectedEntry.Tenant / @selectedEntry.Environment.ToUpperInvariant()</p>
+                    <h1>@selectedEntry.FileName</h1>
+                </div>
+            </div>
+
+            <div class="detail-toolbar detail-card detail-card-wide">
+                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!ShouldShowPromoteButton)">Promote</button>
+            </div>
+
+            <div class="detail-card detail-card-wide">
+                <div class="section-heading">
+                    <h2>Overview</h2>
+                </div>
                 <dl class="overview-grid">
                     <div>
                         <dt>Operation unit</dt>
@@ -79,20 +79,6 @@ else
                         <dd>@GetPrdMatchLabel(selectedEntry)</dd>
                     </div>
                 </dl>
-            </div>
-
-            <div class="detail-card">
-                <h2>Feature flags</h2>
-                <div class="pill-list">
-                    @foreach (var flag in selectedConfig.FeatureFlags)
-                    {
-                        <div class="pill-card">
-                            <strong>@DisplayValue(flag.Tenant)</strong>
-                            <span>@(flag.Enabled ? "Enabled" : "Disabled")</span>
-                            <small>@string.Join(", ", flag.Environments.Select(environment => environment.ToUpperInvariant()))</small>
-                        </div>
-                    }
-                </div>
             </div>
 
             @if (selectedConfig.Condition is not null)
@@ -252,6 +238,11 @@ else
             ? "Config Details"
             : $"{selectedEntry.FileName} • {selectedEntry.Tenant}/{selectedEntry.Environment}";
 
+    private bool ShouldShowPromoteButton =>
+        selectedEntry is not null &&
+        string.Equals(selectedEntry.Environment, "uat", StringComparison.OrdinalIgnoreCase) &&
+        selectedEntry.HasMatchingPrdVersion == false;
+
     protected override async Task OnParametersSetAsync()
     {
         isLoading = true;
@@ -295,6 +286,18 @@ else
         !string.Equals(entry.Environment, "uat", StringComparison.OrdinalIgnoreCase)
             ? "—"
             : entry.HasMatchingPrdVersion == true ? "Yes" : "No";
+
+    private async Task ConfirmPromoteAsync()
+    {
+        if (selectedEntry is null)
+        {
+            return;
+        }
+
+        await JsRuntime.InvokeAsync<bool>(
+            "confirm",
+            $"Promote '{selectedEntry.FileName}' for tenant '{selectedEntry.Tenant}' from UAT to PRD?");
+    }
 
     private static string FormatJson(JsonElement element) =>
         JsonSerializer.Serialize(element, JsonOptions);
