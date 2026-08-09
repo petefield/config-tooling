@@ -176,7 +176,7 @@ else
     }
 
     private static string BuildDetailsUri(ConfigCatalogEntry entry) =>
-        $"/config?path={Uri.EscapeDataString(entry.OutputFile)}";
+        $"config?path={Uri.EscapeDataString(entry.OutputFile)}";
 
     private static string FormatOptionLabel(string value) =>
         value == AllOption ? "All" : value.ToUpperInvariant();

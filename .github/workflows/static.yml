@@ -37,7 +37,7 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Generate config data
-        run: dotnet run --project ./src/config-tooling/config-tooling.csproj
+        run: dotnet run --project ./src/config-tooling/config-tooling.csproj -- ./configs ./src/config-tooling/root
       - name: Publish browser app
         run: dotnet publish ./src/config-browser/config-browser.csproj -c Release -o ./artifacts/config-browser
       - name: Configure published site
