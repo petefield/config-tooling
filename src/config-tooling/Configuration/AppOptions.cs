@@ -7,7 +7,7 @@
             : PathResolver.FindDefaultSourceDirectory(currentDirectory);
         var destinationRoot = args.Length > 1
             ? Path.GetFullPath(args[1], currentDirectory)
-            : Path.Combine(currentDirectory, "root");
+            : Path.Combine(currentDirectory, "output");
         var repositoryRoot = PathResolver.FindGitRepositoryRoot(sourceDirectory)
             ?? throw new InvalidOperationException(
                 $"Config directory '{sourceDirectory}' is not inside a git repository.");

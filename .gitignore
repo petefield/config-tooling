@@ -483,3 +483,5 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+src/config-tooling/root/history-index.json
+src/config-tooling/root/history-index.json
