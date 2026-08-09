@@ -34,37 +34,40 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+
       - name: Install wasm tools
         run: dotnet workload install wasm-tools
+
       - name: Restore projects
         run: |
           dotnet restore ./src/config-tooling/config-tooling.csproj
           dotnet restore ./src/config-browser/config-browser.csproj
-      - name: Generate config data
-        run: dotnet run --no-restore --project ./src/config-tooling/config-tooling.csproj -- ./configs ./src/config-tooling/root
-      - name: Verify generated config data
-        run: test -f ./src/config-tooling/root/history-index.json
+
       - name: Publish browser app
         working-directory: ./src/config-browser
         run: dotnet publish ./config-browser.csproj -c Release --no-restore -o ../../artifacts/config-browser
-      - name: Copy generated config data into published site
-        run: |
-          mkdir -p ./artifacts/config-browser/wwwroot/data
-          cp -R ./src/config-tooling/root/. ./artifacts/config-browser/wwwroot/data/
+
+      - name: Generate config data
+        run: dotnet run --no-restore --project ./src/config-tooling/config-tooling.csproj -- ./configs ./artifacts/config-browser/wwwroot/data/
+
       - name: Configure published site
         run: |
           sed -i 's|<base href="/" />|<base href="/${{ github.event.repository.name }}/" />|' ./artifacts/config-browser/wwwroot/index.html
           cp ./artifacts/config-browser/wwwroot/index.html ./artifacts/config-browser/wwwroot/404.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './artifacts/config-browser/wwwroot'
+          
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
