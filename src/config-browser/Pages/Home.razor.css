@@ -107,66 +107,73 @@
     margin: 0;
 }
 
-.results-list {
-    display: grid;
-    gap: 1rem;
+.results-table-wrap {
+    overflow-x: auto;
 }
 
-.result-item {
-    background: rgba(30, 41, 59, 0.74);
-    border: 1px solid rgba(148, 163, 184, 0.16);
-    border-radius: 20px;
-    color: inherit;
-    display: block;
-    padding: 1.25rem;
-    text-decoration: none;
-    transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+.results-table {
+    border-collapse: collapse;
+    min-width: 100%;
+    width: 100%;
 }
 
-.result-item:hover {
-    background: rgba(37, 99, 235, 0.18);
-    border-color: rgba(96, 165, 250, 0.45);
-    transform: translateY(-2px);
+.results-table th,
+.results-table td {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 0.9rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
 }
 
-.result-topline {
-    align-items: center;
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
-    margin-bottom: 0.9rem;
+.results-table th {
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
 }
 
-.result-topline h3 {
-    margin: 0;
+.results-table tbody tr {
+    transition: background 0.15s ease;
 }
 
-.result-badge {
+.results-table tbody tr:hover {
+    background: rgba(37, 99, 235, 0.12);
+}
+
+.results-table td {
+    color: #e2e8f0;
+    word-break: break-word;
+}
+
+.results-table code {
+    color: #bfdbfe;
+    font-family: inherit;
+    font-size: 0.92rem;
+}
+
+.table-badge {
     background: rgba(59, 130, 246, 0.16);
     border: 1px solid rgba(96, 165, 250, 0.28);
     border-radius: 999px;
     color: #bfdbfe;
-    font-size: 0.8rem;
-    padding: 0.35rem 0.7rem;
+    display: inline-block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.28rem 0.6rem;
     white-space: nowrap;
 }
 
-.result-meta {
-    display: grid;
-    gap: 0.75rem;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0;
+.table-link {
+    color: #f8fafc;
+    font-weight: 600;
+    text-decoration: none;
 }
 
-.result-meta dt {
-    color: #94a3b8;
-    font-size: 0.8rem;
-    margin-bottom: 0.2rem;
-}
-
-.result-meta dd {
-    margin: 0;
-    word-break: break-word;
+.table-link:hover {
+    color: #93c5fd;
+    text-decoration: underline;
 }
 
 .empty-results {
@@ -189,8 +196,7 @@
         flex-direction: column;
     }
 
-    .hero-stats,
-    .result-meta {
+    .hero-stats {
         grid-template-columns: 1fr;
     }
 }

@@ -89,27 +89,32 @@ else
             }
             else
             {
-                <div class="results-list">
-                    @foreach (var entry in FilteredEntries)
-                    {
-                        <a class="result-item" href="@BuildDetailsUri(entry)">
-                            <div class="result-topline">
-                                <h3>@entry.FileName</h3>
-                                <span class="result-badge">@entry.Tenant / @entry.Environment.ToUpperInvariant()</span>
-                            </div>
-
-                            <dl class="result-meta">
-                                <div>
-                                    <dt>Source</dt>
-                                    <dd>@entry.SourceFile</dd>
-                                </div>
-                                <div>
-                                    <dt>Last change</dt>
-                                    <dd>@GetLastChangeSummary(entry)</dd>
-                                </div>
-                            </dl>
-                        </a>
-                    }
+                <div class="results-table-wrap">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Tenant</th>
+                                <th>Environment</th>
+                                <th>File</th>
+                                <th>Source</th>
+                                <th>Last change</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in FilteredEntries)
+                            {
+                                <tr>
+                                    <td><span class="table-badge">@entry.Tenant</span></td>
+                                    <td>@entry.Environment.ToUpperInvariant()</td>
+                                    <td>
+                                        <a class="table-link" href="@BuildDetailsUri(entry)">@entry.FileName</a>
+                                    </td>
+                                    <td><code>@entry.SourceFile</code></td>
+                                    <td>@GetLastChangeSummary(entry)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             }
         </section>
