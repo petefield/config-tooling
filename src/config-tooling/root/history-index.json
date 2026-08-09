@@ -1,5 +1,5 @@
 {
-  "GeneratedAtUtc": "2026-08-09T16:24:18.2396313+00:00",
+  "GeneratedAtUtc": "2026-08-09T16:26:14.2194609+00:00",
   "Files": [
     {
       "OutputFile": "ndc/dev/Email_AccountClosed.json",
@@ -123,6 +123,11 @@
           "Message": "add browser"
         }
       ]
+    },
+    {
+      "OutputFile": "ndc/dev/Email_Testing.json",
+      "SourceFile": "configs/Email_Testing.json",
+      "Modifications": []
     },
     {
       "OutputFile": "ndc/dev/Letter_AccountClosed.json",
