@@ -73,14 +73,7 @@
             "tenant": "ndc",
             "enabled": true,
             "environments": [
-                "all"
-            ]
-        },
-        {
-            "tenant": "a05",
-            "enabled": true,
-            "environments": [
-                "all"
+                "dev"
             ]
         }
     ]
