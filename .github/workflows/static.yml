@@ -36,13 +36,18 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+          cache: true
+      - name: Restore projects
+        run: |
+          dotnet restore ./src/config-tooling/config-tooling.csproj
+          dotnet restore ./src/config-browser/config-browser.csproj
       - name: Generate config data
-        run: dotnet run --project ./src/config-tooling/config-tooling.csproj -- ./configs ./src/config-tooling/root
+        run: dotnet run --no-restore --project ./src/config-tooling/config-tooling.csproj -- ./configs ./src/config-tooling/root
       - name: Verify generated config data
         run: test -f ./src/config-tooling/root/history-index.json
       - name: Publish browser app
         working-directory: ./src/config-browser
-        run: dotnet publish ./config-browser.csproj -c Release -o ../../artifacts/config-browser
+        run: dotnet publish ./config-browser.csproj -c Release --no-restore -o ../../artifacts/config-browser
       - name: Copy generated config data into published site
         run: |
           mkdir -p ./artifacts/config-browser/wwwroot/data
