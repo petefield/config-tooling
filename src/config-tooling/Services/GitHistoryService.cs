@@ -40,6 +40,7 @@ internal sealed class GitHistoryService
 
         startInfo.ArgumentList.Add("--no-pager");
         startInfo.ArgumentList.Add("log");
+        startInfo.ArgumentList.Add("--first-parent");
         startInfo.ArgumentList.Add("--follow");
         startInfo.ArgumentList.Add("--diff-filter=AMR");
         startInfo.ArgumentList.Add("-n");
