@@ -1,0 +1,15 @@
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/bin/Debug/net10.0/config-tooling
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/bin/Debug/net10.0/config-tooling.deps.json
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/bin/Debug/net10.0/config-tooling.runtimeconfig.json
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/bin/Debug/net10.0/config-tooling.dll
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/bin/Debug/net10.0/config-tooling.pdb
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.GeneratedMSBuildEditorConfig.editorconfig
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.AssemblyInfoInputs.cache
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.AssemblyInfo.cs
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.csproj.CoreCompileInputs.cache
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.sourcelink.json
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.dll
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/refint/config-tooling.dll
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.pdb
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/config-tooling.genruntimeconfig.cache
+/home/pete/Source/config-tooling/config-tooling/src/config-tooling/obj/Debug/net10.0/ref/config-tooling.dll
