@@ -40,6 +40,8 @@ internal sealed class GitHistoryService
         startInfo.ArgumentList.Add("--no-pager");
         startInfo.ArgumentList.Add("log");
         startInfo.ArgumentList.Add("--follow");
+        startInfo.ArgumentList.Add("--no-merges");
+        startInfo.ArgumentList.Add("--diff-filter=AMR");
         startInfo.ArgumentList.Add("-n");
         startInfo.ArgumentList.Add(HistoryLimit.ToString(CultureInfo.InvariantCulture));
         startInfo.ArgumentList.Add("--date=iso-strict");
