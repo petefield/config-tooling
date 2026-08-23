@@ -36,7 +36,7 @@ internal sealed class ConfigDataService
             return _catalog;
         }
 
-        using var response = await SendAuthenticatedGetAsync(BuildCatalogApiUrl());
+        using var response = await SendAuthenticatedReadAsync(BuildCatalogApiUrl());
 
         var apiCatalog = await ReadJsonAsync<ConfigCatalogResponse>(
                 response,
@@ -78,7 +78,7 @@ internal sealed class ConfigDataService
             return cachedHistory;
         }
 
-        using var response = await SendAuthenticatedGetAsync(BuildHistoryApiUrl(sourceFile));
+        using var response = await SendAuthenticatedReadAsync(BuildHistoryApiUrl(), sourceFile);
 
         var history = await ReadJsonAsync<List<GitModification>>(
                 response,
@@ -166,7 +166,7 @@ internal sealed class ConfigDataService
             return cachedConfig;
         }
 
-        using var response = await SendAuthenticatedGetAsync(BuildFileApiUrl(outputFile));
+        using var response = await SendAuthenticatedReadAsync(BuildFileApiUrl(), outputFile);
 
         var rawConfig = await response.Content.ReadAsStringAsync();
 
@@ -180,20 +180,35 @@ internal sealed class ConfigDataService
     }
 
     private string BuildCatalogApiUrl() =>
-        $"{_promoteApiBaseUrl}/api/configs/catalog?owner={Uri.EscapeDataString(_repository.Owner)}&repo={Uri.EscapeDataString(_repository.Name)}&branch={Uri.EscapeDataString(_repository.BaseBranch)}";
+        $"{_promoteApiBaseUrl}/api/configs/catalog";
 
-    private string BuildFileApiUrl(string outputFile) =>
-        $"{_promoteApiBaseUrl}/api/configs/file?owner={Uri.EscapeDataString(_repository.Owner)}&repo={Uri.EscapeDataString(_repository.Name)}&branch={Uri.EscapeDataString(_repository.BaseBranch)}&path={Uri.EscapeDataString(outputFile)}";
+    private string BuildFileApiUrl() =>
+        $"{_promoteApiBaseUrl}/api/configs/file";
 
-    private string BuildHistoryApiUrl(string sourceFile) =>
-        $"{_promoteApiBaseUrl}/api/configs/history?owner={Uri.EscapeDataString(_repository.Owner)}&repo={Uri.EscapeDataString(_repository.Name)}&branch={Uri.EscapeDataString(_repository.BaseBranch)}&path={Uri.EscapeDataString(sourceFile)}";
+    private string BuildHistoryApiUrl() =>
+        $"{_promoteApiBaseUrl}/api/configs/history";
 
-    private async Task<HttpResponseMessage> SendAuthenticatedGetAsync(string requestUri)
+    private async Task<HttpResponseMessage> SendAuthenticatedReadAsync(string requestUri, string? path = null)
     {
-        using var request = await _promotionService.CreateAuthenticatedRequestAsync(
-            HttpMethod.Get,
-            requestUri,
+        var authSession = await _promotionService.GetRequiredAuthSessionAsync(
             "Sign in with GitHub before browsing configs.");
+        var formValues = new Dictionary<string, string>
+        {
+            ["authSession"] = authSession,
+            ["owner"] = _repository.Owner,
+            ["repo"] = _repository.Name,
+            ["branch"] = _repository.BaseBranch
+        };
+
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            formValues["path"] = path;
+        }
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, requestUri)
+        {
+            Content = new FormUrlEncodedContent(formValues)
+        };
         var response = await _httpClient.SendAsync(request);
 
         await _promotionService.UpdateAuthSessionAsync(ReadUpdatedAuthSession(response));

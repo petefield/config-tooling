@@ -1,4 +1,6 @@
 using System.Net;
+using System.Collections.Specialized;
+using System.IO;
 using System.Text.Json;
 using config_promote_api.Models;
 using config_promote_api.Services;
@@ -24,7 +26,7 @@ internal sealed class ConfigReadFunctions
 
     [Function("ReadConfigCatalog")]
     public async Task<HttpResponseData> ReadCatalogAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "configs/catalog")] HttpRequestData request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "configs/catalog")] HttpRequestData request)
     {
         if (HttpMethods.IsOptions(request.Method))
         {
@@ -33,8 +35,9 @@ internal sealed class ConfigReadFunctions
 
         try
         {
-            var authSession = await GetAuthenticatedSessionAsync(request);
-            var repository = ReadRepository(request);
+            var values = await ReadValuesAsync(request);
+            var authSession = await GetAuthenticatedSessionAsync(request, values);
+            var repository = ReadRepository(values);
             var result = await _readService.GetCatalogAsync(repository, authSession.AccessToken);
             return await CreateJsonAsync(request, HttpStatusCode.OK, result, authSession.AuthSession);
         }
@@ -50,7 +53,7 @@ internal sealed class ConfigReadFunctions
 
     [Function("ReadConfigFile")]
     public async Task<HttpResponseData> ReadFileAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "configs/file")] HttpRequestData request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "configs/file")] HttpRequestData request)
     {
         if (HttpMethods.IsOptions(request.Method))
         {
@@ -59,9 +62,10 @@ internal sealed class ConfigReadFunctions
 
         try
         {
-            var authSession = await GetAuthenticatedSessionAsync(request);
-            var repository = ReadRepository(request);
-            var outputFile = GetRequiredQueryValue(request, "path");
+            var values = await ReadValuesAsync(request);
+            var authSession = await GetAuthenticatedSessionAsync(request, values);
+            var repository = ReadRepository(values);
+            var outputFile = GetRequiredValue(values, "path");
             var rawContent = await _readService.GetRawConfigByOutputFileAsync(repository, outputFile, authSession.AccessToken);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
@@ -83,7 +87,7 @@ internal sealed class ConfigReadFunctions
 
     [Function("ReadConfigHistory")]
     public async Task<HttpResponseData> ReadHistoryAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "options", Route = "configs/history")] HttpRequestData request)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", "options", Route = "configs/history")] HttpRequestData request)
     {
         if (HttpMethods.IsOptions(request.Method))
         {
@@ -92,9 +96,10 @@ internal sealed class ConfigReadFunctions
 
         try
         {
-            var authSession = await GetAuthenticatedSessionAsync(request);
-            var repository = ReadRepository(request);
-            var sourceFile = GetRequiredQueryValue(request, "path");
+            var values = await ReadValuesAsync(request);
+            var authSession = await GetAuthenticatedSessionAsync(request, values);
+            var repository = ReadRepository(values);
+            var sourceFile = GetRequiredValue(values, "path");
             var history = await _readService.GetHistoryAsync(repository, sourceFile, authSession.AccessToken);
             return await CreateJsonAsync(request, HttpStatusCode.OK, history, authSession.AuthSession);
         }
@@ -108,42 +113,49 @@ internal sealed class ConfigReadFunctions
         }
     }
 
-    private static GitHubRepository ReadRepository(HttpRequestData request) =>
+    private static GitHubRepository ReadRepository(NameValueCollection values) =>
         new()
         {
-            Owner = GetRequiredQueryValue(request, "owner"),
-            Name = GetRequiredQueryValue(request, "repo"),
-            BaseBranch = GetRequiredQueryValue(request, "branch")
+            Owner = GetRequiredValue(values, "owner"),
+            Name = GetRequiredValue(values, "repo"),
+            BaseBranch = GetRequiredValue(values, "branch")
         };
 
-    private static string GetRequiredQueryValue(HttpRequestData request, string key)
+    private static string GetRequiredValue(NameValueCollection values, string key)
     {
-        var query = System.Web.HttpUtility.ParseQueryString(request.Url.Query);
-        var value = query[key];
+        var value = values[key];
 
         if (string.IsNullOrWhiteSpace(value))
         {
-            throw new InvalidOperationException($"Missing required query value '{key}'.");
+            throw new InvalidOperationException($"Missing required request value '{key}'.");
         }
 
         return value;
     }
 
-    private async Task<GitHubUserTokenService.AuthenticatedGitHubSession> GetAuthenticatedSessionAsync(HttpRequestData request)
+    private static async Task<NameValueCollection> ReadValuesAsync(HttpRequestData request)
     {
-        if (!request.Headers.TryGetValues("Authorization", out var values))
+        if (!HttpMethods.IsPost(request.Method))
         {
-            throw new AuthenticationRequiredException("Sign in with GitHub before browsing configs.");
+            return System.Web.HttpUtility.ParseQueryString(request.Url.Query);
         }
 
-        var authorization = values.FirstOrDefault();
+        using var reader = new StreamReader(request.Body, leaveOpen: true);
+        var body = await reader.ReadToEndAsync();
+        return System.Web.HttpUtility.ParseQueryString(body);
+    }
 
-        if (string.IsNullOrWhiteSpace(authorization) || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+    private async Task<GitHubUserTokenService.AuthenticatedGitHubSession> GetAuthenticatedSessionAsync(HttpRequestData request, NameValueCollection values)
+    {
+        var authSessionToken = values["authSession"];
+
+        if (string.IsNullOrWhiteSpace(authSessionToken) && request.Headers.TryGetValues("Authorization", out var headerValues))
         {
-            throw new AuthenticationRequiredException("Sign in with GitHub before browsing configs.");
+            var authorization = headerValues.FirstOrDefault();
+            authSessionToken = string.IsNullOrWhiteSpace(authorization) || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase)
+                ? null
+                : authorization["Bearer ".Length..].Trim();
         }
-
-        var authSessionToken = authorization["Bearer ".Length..].Trim();
 
         if (string.IsNullOrWhiteSpace(authSessionToken))
         {

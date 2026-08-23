@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json;
 using config_browser.Models;
 using Microsoft.Extensions.Configuration;
@@ -44,6 +45,9 @@ internal sealed class GitHubPromotionService
 
     public async Task SignOutAsync() =>
         await ClearAuthSessionAsync();
+
+    public async Task<string> GetRequiredAuthSessionAsync(string missingSessionMessage) =>
+        await GetAuthSessionAsync() ?? throw new GitHubAuthenticationRequiredException(missingSessionMessage);
 
     public async Task<HttpRequestMessage> CreateAuthenticatedRequestAsync(
         HttpMethod method,
@@ -91,10 +95,11 @@ internal sealed class GitHubPromotionService
             FileContents = fileContents
         };
 
-        using var response = await _httpClient.PostAsJsonAsync(
-            $"{GetPromoteApiBaseUrl()}/api/promote",
-            request,
-            JsonOptions);
+        using var response = await _httpClient.SendAsync(
+            new HttpRequestMessage(HttpMethod.Post, $"{GetPromoteApiBaseUrl()}/api/promote")
+            {
+                Content = new StringContent(JsonSerializer.Serialize(request, JsonOptions), Encoding.UTF8, "text/plain")
+            });
 
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
         {
