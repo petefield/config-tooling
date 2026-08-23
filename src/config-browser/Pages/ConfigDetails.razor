@@ -40,8 +40,6 @@ else if (selectedEntry is null || selectedConfig is null)
 else
 {
     <div class="details-shell">
-        <a class="back-link" href="">← Back to config list</a>
-
         <section class="details-grid">
             <div class="detail-card detail-card-wide title-card">
                 <div class="toolbar-title">
@@ -51,23 +49,89 @@ else
             </div>
 
             <div class="detail-toolbar detail-card detail-card-wide">
-                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote || isPromoting)">@GetPromoteButtonLabel(selectedEntry, isPromoting)</button>
+                <div class="toolbar-group">
+                    <a class="toolbar-button toolbar-button-secondary" href="">
+                        <span class="toolbar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path d="M6.78 3.22a.75.75 0 0 1 0 1.06L3.81 7.25H13a.75.75 0 0 1 0 1.5H3.81l2.97 2.97a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" />
+                            </svg>
+                        </span>
+                        <span>Back to catalog</span>
+                    </a>
 
-                @if (promotionErrorMessage is not null)
-                {
-                    <p class="toolbar-message toolbar-message-error">@promotionErrorMessage</p>
-                }
-                else if (promotionMessage is not null)
-                {
-                    <p class="toolbar-message">
+                    @if (selectedRepository is not null)
+                    {
+                        <a class="toolbar-button toolbar-button-secondary" href="@BuildSourceFileUrl()" target="_blank" rel="noreferrer">
+                            <span class="toolbar-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M3.75 2A1.75 1.75 0 0 0 2 3.75v8.5C2 13.216 2.784 14 3.75 14h8.5A1.75 1.75 0 0 0 14 12.25v-3a.75.75 0 0 0-1.5 0v3a.25.25 0 0 1-.25.25h-8.5a.25.25 0 0 1-.25-.25v-8.5c0-.138.112-.25.25-.25h3a.75.75 0 0 0 0-1.5h-3Z" />
+                                    <path d="M9 2.75A.75.75 0 0 1 9.75 2h3.5c.414 0 .75.336.75.75v3.5a.75.75 0 0 1-1.5 0V4.56L8.53 8.53a.75.75 0 0 1-1.06-1.06L11.44 3.5H9.75A.75.75 0 0 1 9 2.75Z" />
+                                </svg>
+                            </span>
+                            <span>Open source</span>
+                        </a>
+                    }
+                </div>
+
+                <div class="toolbar-group toolbar-group-end">
+                    <div class="toolbar-status @(CanPromote ? "ready" : "current")">
+                        <span class="toolbar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                @if (CanPromote)
+                                {
+                                    <path d="M8.22 2.22a.75.75 0 0 0-1.06 0L2.91 6.47a.75.75 0 1 0 1.06 1.06L7 4.5V13a.75.75 0 0 0 1.5 0V4.5l3.03 3.03a.75.75 0 0 0 1.06-1.06L8.22 2.22Z" />
+                                }
+                                else
+                                {
+                                    <path d="M13.78 8.53a.75.75 0 0 0 0-1.06L9.53 3.22a.75.75 0 0 0-1.06 1.06L11.44 7.25H3a.75.75 0 0 0 0 1.5h8.44l-2.97 2.97a.75.75 0 1 0 1.06 1.06l4.25-4.25Z" />
+                                }
+                            </svg>
+                        </span>
+                        <div class="toolbar-status-copy">
+                            <strong>@GetToolbarStatusTitle(selectedEntry)</strong>
+                            <span>@GetToolbarStatusText(selectedEntry)</span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="toolbar-button toolbar-button-primary" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote || isPromoting)">
+                        <span class="toolbar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path d="M8.22 2.22a.75.75 0 0 0-1.06 0L2.91 6.47a.75.75 0 1 0 1.06 1.06L7 4.5V13a.75.75 0 0 0 1.5 0V4.5l3.03 3.03a.75.75 0 0 0 1.06-1.06L8.22 2.22Z" />
+                            </svg>
+                        </span>
+                        <span>@GetPromoteButtonLabel(selectedEntry, isPromoting)</span>
+                    </button>
+                </div>
+            </div>
+
+            @if (promotionErrorMessage is not null)
+            {
+                <div class="toolbar-feedback detail-card detail-card-wide toolbar-feedback-error">
+                    <span class="toolbar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" focusable="false">
+                            <path d="M6.457 1.047c.659-1.182 2.427-1.182 3.086 0l5.47 9.819c.64 1.15-.19 2.584-1.543 2.584H2.53C1.177 13.45.347 12.016.987 10.866l5.47-9.819ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                        </svg>
+                    </span>
+                    <p>@promotionErrorMessage</p>
+                </div>
+            }
+            else if (promotionMessage is not null)
+            {
+                <div class="toolbar-feedback detail-card detail-card-wide">
+                    <span class="toolbar-icon" aria-hidden="true">
+                        <svg viewBox="0 0 16 16" focusable="false">
+                            <path d="M13.78 3.97a.75.75 0 1 0-1.06-1.06L6.5 9.128 3.28 5.91a.75.75 0 1 0-1.06 1.06l3.75 3.75a.75.75 0 0 0 1.06 0l6.75-6.75Z" />
+                        </svg>
+                    </span>
+                    <p>
                         @promotionMessage
                         @if (promotionPullRequestUrl is not null)
                         {
                             <a href="@promotionPullRequestUrl" target="_blank" rel="noreferrer">Open PR</a>
                         }
                     </p>
-                }
-            </div>
+                </div>
+            }
 
             <div class="detail-card detail-card-wide tabbed-details-card">
                 <div class="details-tabs" role="tablist" aria-label="Config detail sections">
@@ -76,31 +140,59 @@ else
                             role="tab"
                             aria-selected="@IsSelectedTab(DetailTab.Overview)"
                             @onclick="@(() => SelectTab(DetailTab.Overview))">
-                        Overview
+                        <span class="details-tab-content">
+                            <span class="details-tab-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M2.75 3A1.75 1.75 0 0 0 1 4.75v6.5C1 12.216 1.784 13 2.75 13h10.5A1.75 1.75 0 0 0 15 11.25v-6.5A1.75 1.75 0 0 0 13.25 3H2.75Zm0 1.5h10.5a.25.25 0 0 1 .25.25v1.19H2.5V4.75a.25.25 0 0 1 .25-.25Zm-.25 2.94h11v3.81a.25.25 0 0 1-.25.25H2.75a.25.25 0 0 1-.25-.25V7.44Z" />
+                                </svg>
+                            </span>
+                            <span>Overview</span>
+                        </span>
                     </button>
                     <button type="button"
                             class="@GetTabButtonClass(DetailTab.InputData)"
                             role="tab"
                             aria-selected="@IsSelectedTab(DetailTab.InputData)"
                             @onclick="@(() => SelectTab(DetailTab.InputData))">
-                        Input data
-                        <span>@selectedConfig.InputData.Count</span>
+                        <span class="details-tab-content">
+                            <span class="details-tab-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M2.75 2h10.5C14.216 2 15 2.784 15 3.75v8.5c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 12.25v-8.5C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25H2.75Zm1.5 1.75a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3A.75.75 0 0 1 5 10.5h3a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z" />
+                                </svg>
+                            </span>
+                            <span>Input data</span>
+                        </span>
+                        <span class="details-tab-count">@selectedConfig.InputData.Count</span>
                     </button>
                     <button type="button"
                             class="@GetTabButtonClass(DetailTab.Mappings)"
                             role="tab"
                             aria-selected="@IsSelectedTab(DetailTab.Mappings)"
                             @onclick="@(() => SelectTab(DetailTab.Mappings))">
-                        Mappings
-                        <span>@selectedConfig.Mapping.Count</span>
+                        <span class="details-tab-content">
+                            <span class="details-tab-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M3 3.75A1.75 1.75 0 0 1 4.75 2h2.5A1.75 1.75 0 0 1 9 3.75v.5h2.25A1.75 1.75 0 0 1 13 6v1.25h.25a1.75 1.75 0 1 1 0 1.5H13V10a1.75 1.75 0 0 1-1.75 1.75H9v.5A1.75 1.75 0 0 1 7.25 14h-2.5A1.75 1.75 0 0 1 3 12.25v-.5H1.75a.75.75 0 0 1 0-1.5H3V8.75h-.25a1.75 1.75 0 1 1 0-1.5H3V6c0-.966.784-1.75 1.75-1.75H6V3.75c0-.138-.112-.25-.25-.25h-1A.25.25 0 0 0 4.5 3.75v8.5c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25v-.5H4.75A1.75 1.75 0 0 1 3 10V3.75Zm6 2v4.5h2.25a.25.25 0 0 0 .25-.25V6a.25.25 0 0 0-.25-.25H9Z" />
+                                </svg>
+                            </span>
+                            <span>Mappings</span>
+                        </span>
+                        <span class="details-tab-count">@selectedConfig.Mapping.Count</span>
                     </button>
                     <button type="button"
                             class="@GetTabButtonClass(DetailTab.History)"
                             role="tab"
                             aria-selected="@IsSelectedTab(DetailTab.History)"
                             @onclick="@(() => SelectTab(DetailTab.History))">
-                        Git history
-                        <span>@selectedEntry.Modifications.Count</span>
+                        <span class="details-tab-content">
+                            <span class="details-tab-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path d="M8 1.5a6.5 6.5 0 1 0 4.596 11.096.75.75 0 1 0-1.06-1.06A5 5 0 1 1 13 8a.75.75 0 0 0 1.5 0A6.5 6.5 0 0 0 8 1.5Zm.75 3.25a.75.75 0 0 0-1.5 0V8c0 .199.079.39.22.53l2 2a.75.75 0 0 0 1.06-1.06L8.75 7.69V4.75Z" />
+                                </svg>
+                            </span>
+                            <span>Git history</span>
+                        </span>
+                        <span class="details-tab-count">@selectedEntry.Modifications.Count</span>
                     </button>
                     @if (selectedConfig.AdditionalProperties.Count > 0)
                     {
@@ -109,8 +201,15 @@ else
                                 role="tab"
                                 aria-selected="@IsSelectedTab(DetailTab.Additional)"
                                 @onclick="@(() => SelectTab(DetailTab.Additional))">
-                            Additional
-                            <span>@selectedConfig.AdditionalProperties.Count</span>
+                            <span class="details-tab-content">
+                                <span class="details-tab-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 16 16" focusable="false">
+                                        <path d="M2.75 2h6.19c.464 0 .91.184 1.238.513l2.81 2.81c.329.328.513.774.513 1.238v6.689c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 13.25V3.75C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6.75H9.75A1.75 1.75 0 0 1 8 5V3.5H2.75ZM9.5 3.81V5a.25.25 0 0 0 .25.25h1.19L9.5 3.81Z" />
+                                    </svg>
+                                </span>
+                                <span>Additional</span>
+                            </span>
+                            <span class="details-tab-count">@selectedConfig.AdditionalProperties.Count</span>
                         </button>
                     }
                 </div>
@@ -461,10 +560,29 @@ else
     private string GetAppOrigin() =>
         NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority);
 
+    private string BuildSourceFileUrl() =>
+        selectedEntry is null || selectedRepository is null
+            ? "#"
+            : $"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/blob/{Uri.EscapeDataString(selectedRepository.BaseBranch)}/{selectedEntry.SourceFile}";
+
     private string BuildCommitUrl(string commit) =>
         selectedRepository is null
             ? "#"
             : $"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/commit/{Uri.EscapeDataString(commit)}";
+
+    private string GetToolbarStatusTitle(ConfigCatalogEntry? entry) =>
+        entry is null
+            ? "Status unavailable"
+            : CanPromote
+                ? $"Ready for {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}"
+                : "Current environment";
+
+    private string GetToolbarStatusText(ConfigCatalogEntry? entry) =>
+        entry is null
+            ? "No configuration selected."
+            : CanPromote
+                ? $"Review complete and promote from {entry.Environment.ToUpperInvariant()} when ready."
+                : "No forward promotion action is available for this config.";
 
     private static string GetMatchFieldLabel(ConfigCatalogEntry entry) =>
         string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase)
@@ -487,6 +605,7 @@ else
         entry is null
             ? "Promote"
             : $"Promote to {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}";
+
 
     private async Task ConfirmPromoteAsync()
     {

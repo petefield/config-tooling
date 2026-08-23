@@ -95,7 +95,32 @@
     transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.details-tab span {
+.details-tab-content {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.55rem;
+}
+
+.details-tab-icon,
+.toolbar-icon {
+    align-items: center;
+    display: inline-flex;
+    flex: 0 0 auto;
+    justify-content: center;
+}
+
+.details-tab-icon svg,
+.toolbar-icon svg {
+    display: block;
+    fill: currentColor;
+}
+
+.details-tab-icon svg {
+    height: 0.95rem;
+    width: 0.95rem;
+}
+
+.details-tab-count {
     background: rgba(36, 79, 132, 0.08);
     border-radius: 999px;
     color: #48627e;
@@ -118,7 +143,7 @@
     color: #13263d;
 }
 
-.details-tab.active span {
+.details-tab.active .details-tab-count {
     background: rgba(31, 95, 191, 0.1);
     color: #1f5fbf;
 }
@@ -161,11 +186,12 @@
 
 .detail-toolbar {
     align-items: center;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    border-color: #ccd8e5;
     display: flex;
     gap: 1rem;
     justify-content: space-between;
-    padding: 1.15rem 1.4rem;
-    background: linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+    padding: 1rem 1.2rem;
 }
 
 .title-card {
@@ -192,25 +218,65 @@
     word-break: break-word;
 }
 
-.promote-button {
-    background: linear-gradient(180deg, #2467cc 0%, #154d9e 100%);
-    border: 1px solid #17498b;
-    border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(29, 78, 216, 0.18);
-    color: #ffffff;
-    cursor: pointer;
-    font: inherit;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    padding: 0.78rem 1.2rem;
-    transition: background 0.15s ease, transform 0.15s ease;
+.toolbar-group {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
+.toolbar-group-end {
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+.toolbar-button,
+.promote-button {
+    align-items: center;
+    border-radius: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    font-weight: 700;
+    gap: 0.65rem;
+    letter-spacing: 0.01em;
+    padding: 0.78rem 1rem;
+    text-decoration: none;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.toolbar-button:hover,
 .promote-button:hover {
-    background: linear-gradient(180deg, #205db9 0%, #12488f 100%);
     transform: translateY(-1px);
 }
 
+.toolbar-button-secondary {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f8fc 100%);
+    border: 1px solid #d2dde9;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    color: #1f3959;
+}
+
+.toolbar-button-secondary:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #edf4fb 100%);
+    border-color: #c2d2e3;
+    color: #15304d;
+}
+
+.toolbar-button-primary,
+.promote-button {
+    background: linear-gradient(180deg, #2467cc 0%, #154d9e 100%);
+    border: 1px solid #17498b;
+    box-shadow: 0 10px 20px rgba(29, 78, 216, 0.18);
+    color: #ffffff;
+}
+
+.toolbar-button-primary:hover,
+.promote-button:hover {
+    background: linear-gradient(180deg, #205db9 0%, #12488f 100%);
+}
+
+.toolbar-button-primary:disabled,
 .promote-button:disabled {
     background: #d9e1ea;
     border-color: #c4cfdb;
@@ -220,24 +286,88 @@
     transform: none;
 }
 
-.toolbar-message {
+.toolbar-icon svg {
+    height: 1rem;
+    width: 1rem;
+}
+
+.toolbar-status {
+    align-items: center;
+    background: linear-gradient(180deg, #f9fbfe 0%, #eff5fb 100%);
+    border: 1px solid #d6e1ee;
+    border-radius: 14px;
+    color: #27496d;
+    display: inline-flex;
+    gap: 0.8rem;
+    min-height: 3rem;
+    padding: 0.7rem 0.9rem;
+}
+
+.toolbar-status-copy strong,
+.toolbar-status-copy span {
+    display: block;
+}
+
+.toolbar-status-copy strong {
+    color: #18314d;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.toolbar-status-copy span {
+    color: #5b7089;
+    font-size: 0.82rem;
+    margin-top: 0.15rem;
+}
+
+.toolbar-status.ready {
+    background: linear-gradient(180deg, #f5fbf7 0%, #edf8f1 100%);
+    border-color: #cae7d4;
+    color: #1f6a3d;
+}
+
+.toolbar-status.ready .toolbar-status-copy strong {
+    color: #185534;
+}
+
+.toolbar-status.ready .toolbar-status-copy span {
+    color: #3d7455;
+}
+
+.toolbar-feedback {
+    align-items: center;
+    background: linear-gradient(180deg, #f8fbff 0%, #f4f8fc 100%);
+    display: flex;
+    gap: 0.8rem;
+    padding: 1rem 1.2rem;
+}
+
+.toolbar-feedback p {
     color: #44627f;
     margin: 0;
 }
 
-.toolbar-message a {
+.toolbar-feedback a {
     color: #1f5fbf;
     font-weight: 600;
     margin-left: 0.5rem;
     text-decoration: none;
 }
 
-.toolbar-message a:hover {
+.toolbar-feedback a:hover {
     color: #144788;
     text-decoration: underline;
 }
 
-.toolbar-message-error {
+.toolbar-feedback-error {
+    background: linear-gradient(180deg, #fff7f7 0%, #fdf1f2 100%);
+    border-color: #ecc9cd;
+    color: #b42318;
+}
+
+.toolbar-feedback-error p,
+.toolbar-feedback-error .toolbar-icon {
     color: #b42318;
 }
 
@@ -431,6 +561,22 @@
     .detail-toolbar {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .toolbar-group,
+    .toolbar-group-end {
+        width: 100%;
+    }
+
+    .toolbar-group-end {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .toolbar-button,
+    .promote-button,
+    .toolbar-status {
+        width: 100%;
     }
 
     .toolbar-title h1 {
