@@ -209,17 +209,21 @@ else
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var modification in selectedEntry.Modifications)
-                                {
-                                    <tr>
-                                        <td class="history-message-cell">@modification.Message</td>
-                                        <td>@modification.AuthorName</td>
-                                        <td>@modification.AuthorDate.ToLocalTime():g</td>
-                                        <td><code>@modification.Commit[..8]</code></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                 @foreach (var modification in selectedEntry.Modifications)
+                                 {
+                                     <tr>
+                                         <td class="history-message-cell">@modification.Message</td>
+                                         <td>@modification.AuthorName</td>
+                                         <td>@modification.AuthorDate.ToLocalTime():g</td>
+                                         <td>
+                                             <a class="history-commit-link" href="@BuildCommitUrl(modification.Commit)" target="_blank" rel="noreferrer">
+                                                 <code>@modification.Commit[..8]</code>
+                                             </a>
+                                         </td>
+                                     </tr>
+                                 }
+                             </tbody>
+                         </table>
                     </div>
                 }
             </div>
@@ -284,6 +288,7 @@ else
 
     private ConfigCatalogEntry? selectedEntry;
     private ConfigDocument? selectedConfig;
+    private GitHubRepository? selectedRepository;
     private bool isLoading = true;
     private bool isPromoting;
     private bool requiresSignIn;
@@ -324,6 +329,7 @@ else
         showPromoteModal = false;
         selectedEntry = null;
         selectedConfig = null;
+        selectedRepository = null;
 
         if (string.IsNullOrWhiteSpace(Path))
         {
@@ -334,7 +340,10 @@ else
 
         try
         {
-            selectedEntry = await DataService.GetCatalogEntryAsync(Path);
+            var catalog = await DataService.GetCatalogAsync();
+            selectedRepository = catalog.Repository;
+            selectedEntry = catalog.Entries.FirstOrDefault(
+                entry => string.Equals(entry.OutputFile, Path, StringComparison.OrdinalIgnoreCase));
 
             if (selectedEntry is null)
             {
@@ -383,6 +392,11 @@ else
 
     private string GetAppOrigin() =>
         NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority);
+
+    private string BuildCommitUrl(string commit) =>
+        selectedRepository is null
+            ? "#"
+            : $"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/commit/{Uri.EscapeDataString(commit)}";
 
     private static string GetMatchFieldLabel(ConfigCatalogEntry entry) =>
         string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase)

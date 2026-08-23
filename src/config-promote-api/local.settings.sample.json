@@ -7,6 +7,6 @@
     "GitHubAppClientSecret": "your-client-secret",
     "GitHubAppCallbackUrl": "http://localhost:7071/api/auth/github/callback",
     "GitHubAppSessionKey": "replace-with-base64-32-byte-key",
-    "GitHubAppAllowedOrigins": "http://localhost:5115,https://petefield.github.io"
+    "GitHubAppAllowedOrigins": "http://localhost:5172,https://petefield.github.io"
   }
 }

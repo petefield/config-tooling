@@ -199,6 +199,16 @@
     color: #49627e;
 }
 
+.history-commit-link {
+    color: #1f5fbf;
+    text-decoration: none;
+}
+
+.history-commit-link:hover {
+    color: #144788;
+    text-decoration: underline;
+}
+
 .history-message-cell {
     font-weight: 600;
 }

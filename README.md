@@ -1,10 +1,9 @@
 # config-tooling
 
-This repository contains three related .NET 10 apps:
+This repository contains two related .NET 10 apps:
 
 | Project | Path | Purpose |
 | --- | --- | --- |
-| Console tooling | `src/config-tooling` | Expands config files from `configs/` into output folders and writes git history metadata. |
 | Browser app | `src/config-browser` | Blazor WebAssembly UI for browsing configs and promoting them between environments. |
 | Azure Functions API | `src/config-promote-api` | GitHub sign-in, live GitHub reads, token refresh, and promotion backend. |
 
@@ -23,41 +22,6 @@ This repository contains three related .NET 10 apps:
   - Azure Functions Core Tools
   - Azurite or another local Azure Storage emulator
 - A GitHub App configured for user-to-server authentication
-
-## Console tooling
-
-The console app copies each JSON file from `./configs` into `./root/{tenant}/{environment}` based on its `featureFlags`, then writes `history-index.json` with the last five git modifications for each generated file.
-
-Before each run, the destination root folder is deleted and recreated.
-
-### Run it
-
-```bash
-dotnet run --project src/config-tooling/config-tooling.csproj
-```
-
-Optional arguments:
-
-```bash
-dotnet run --project src/config-tooling/config-tooling.csproj -- <source-config-directory> <destination-root-directory>
-```
-
-Notes:
-
-- An environment value of `all` expands into `dev`, `uat`, and `prd`.
-- When no source directory is supplied, the app searches upward from the current directory for a `configs` folder.
-
-### Refresh generated browser data locally
-
-The browser app no longer depends on generated static data in normal operation, but these scripts are still useful if you want to inspect the console output locally:
-
-```bash
-./refresh-browser-data.sh
-```
-
-```bat
-refresh-browser-data.bat
-```
 
 ## Browser app
 
