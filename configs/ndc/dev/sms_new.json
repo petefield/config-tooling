@@ -1,7 +1,7 @@
 {
     "operationUnit": "atc",
     "connector": "imi",
-    "channel": "smsm",
+    "channel": "sms",
     "trigger": "TestContactType",
     "outputType": "JSON",
     "inputData": [
