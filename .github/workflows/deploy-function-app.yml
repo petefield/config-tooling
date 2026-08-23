@@ -1,14 +1,13 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/azure/functions-action
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy dotnet core project to Azure Function App - config-promote-api
-
+name: Deploy Function App
 on:
   push:
     branches:
       - main
     paths:
-      - '.github/workflows/main_config-promote-api.yml'
+      - '.github/workflows/deploy-function-app.yml'
       - 'src/config-promote-api/**'
   workflow_dispatch:
 
