@@ -30,11 +30,11 @@
     ],
     "mapping": [
         {
-            "inputField": "#ActivationNotificationEmail_03",
+            "inputField": "#ActivationNotificationEmail_Template",
             "outputField": "templateId"
         },
         {
-            "inputField": "#ProactiveLimitIncreaseValidated",
+            "inputField": "#TestCommunicationId",
             "outputField": "CommunicationId"
         },
         {
