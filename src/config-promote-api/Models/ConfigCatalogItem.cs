@@ -9,4 +9,8 @@ internal sealed record ConfigCatalogItem
     public required string ContactType { get; init; }
 
     public required string Channel { get; init; }
+
+    public bool? HasMatchingUatVersion { get; init; }
+
+    public bool? HasMatchingPrdVersion { get; init; }
 }

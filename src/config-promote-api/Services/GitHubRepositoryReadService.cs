@@ -9,6 +9,7 @@ namespace config_promote_api.Services;
 
 internal sealed class GitHubRepositoryReadService
 {
+    private const int CatalogReadConcurrency = 8;
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly HttpClient _httpClient;
 
@@ -25,27 +26,43 @@ internal sealed class GitHubRepositoryReadService
             .Where(item => IsConfigFile(item.Path))
             .OrderBy(static item => item.Path, StringComparer.OrdinalIgnoreCase)
             .ToArray();
-
-        var entries = new List<ConfigCatalogItem>(sourceFiles.Length);
-
-        foreach (var sourceFile in sourceFiles)
+        var matchingFlags = BuildMatchingFlags(sourceFiles);
+        var generatedAtTask = GetLatestCommitDateAsync(repository, accessToken);
+        using var throttler = new SemaphoreSlim(CatalogReadConcurrency);
+        var entryTasks = sourceFiles.Select(async sourceFile =>
         {
-            var rawContent = await GetRawConfigAsync(repository, sourceFile.Path, accessToken);
-            var metadata = ParseConfigMetadata(rawContent);
+            await throttler.WaitAsync();
 
-            entries.Add(new ConfigCatalogItem
+            try
             {
-                OutputFile = BuildOutputFilePath(sourceFile.Path),
-                SourceFile = sourceFile.Path,
-                ContactType = string.IsNullOrWhiteSpace(metadata.Trigger) ? "—" : metadata.Trigger,
-                Channel = string.IsNullOrWhiteSpace(metadata.Channel) ? "—" : metadata.Channel
-            });
-        }
+                var rawContent = await GetRawConfigAsync(repository, sourceFile.Path, accessToken);
+                var metadata = ParseConfigMetadata(rawContent);
+                var outputFile = BuildOutputFilePath(sourceFile.Path);
+                var flags = matchingFlags.TryGetValue(outputFile, out var matchingFlagValues)
+                    ? matchingFlagValues
+                    : new MatchingFlags();
+
+                return new ConfigCatalogItem
+                {
+                    OutputFile = outputFile,
+                    SourceFile = sourceFile.Path,
+                    ContactType = string.IsNullOrWhiteSpace(metadata.Trigger) ? "—" : metadata.Trigger,
+                    Channel = string.IsNullOrWhiteSpace(metadata.Channel) ? "—" : metadata.Channel,
+                    HasMatchingUatVersion = flags.HasMatchingUatVersion,
+                    HasMatchingPrdVersion = flags.HasMatchingPrdVersion
+                };
+            }
+            finally
+            {
+                throttler.Release();
+            }
+        });
+        var entries = await Task.WhenAll(entryTasks);
 
         return new ConfigCatalogResponse
         {
-            GeneratedAtUtc = await GetLatestCommitDateAsync(repository, accessToken),
-            Entries = entries
+            GeneratedAtUtc = await generatedAtTask,
+            Entries = entries.ToList()
         };
     }
 
@@ -161,6 +178,47 @@ internal sealed class GitHubRepositoryReadService
     private static string BuildSourceFilePath(string outputFile) =>
         $"configs/{outputFile}";
 
+    private static Dictionary<string, MatchingFlags> BuildMatchingFlags(IReadOnlyList<GitHubTreeEntry> sourceFiles)
+    {
+        var entriesByKey = sourceFiles.ToDictionary(
+            static item => BuildEnvironmentKey(BuildOutputFilePath(item.Path)),
+            static item => item.Sha,
+            StringComparer.OrdinalIgnoreCase);
+        var matchingFlags = new Dictionary<string, MatchingFlags>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var sourceFile in sourceFiles)
+        {
+            var outputFile = BuildOutputFilePath(sourceFile.Path);
+            var segments = outputFile.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (segments.Length < 3)
+            {
+                continue;
+            }
+
+            var keyPrefix = $"{segments[0]}/{{0}}/{segments[^1]}";
+            matchingFlags[outputFile] = new MatchingFlags
+            {
+                HasMatchingUatVersion = string.Equals(segments[1], "dev", StringComparison.OrdinalIgnoreCase)
+                    ? entriesByKey.TryGetValue(string.Format(keyPrefix, "uat"), out var uatSha) && string.Equals(sourceFile.Sha, uatSha, StringComparison.Ordinal)
+                    : null,
+                HasMatchingPrdVersion = string.Equals(segments[1], "uat", StringComparison.OrdinalIgnoreCase)
+                    ? entriesByKey.TryGetValue(string.Format(keyPrefix, "prd"), out var prdSha) && string.Equals(sourceFile.Sha, prdSha, StringComparison.Ordinal)
+                    : null
+            };
+        }
+
+        return matchingFlags;
+    }
+
+    private static string BuildEnvironmentKey(string outputFile)
+    {
+        var segments = outputFile.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return segments.Length < 3
+            ? outputFile
+            : $"{segments[0]}/{segments[1]}/{segments[^1]}";
+    }
+
     private static GitModification MapToGitModification(GitHubCommitResponse commit)
     {
         var subject = commit.Commit.Message
@@ -205,6 +263,8 @@ internal sealed class GitHubRepositoryReadService
         public required string Path { get; init; }
 
         public required string Type { get; init; }
+
+        public required string Sha { get; init; }
     }
 
     private sealed record GitHubCommitResponse
@@ -235,5 +295,12 @@ internal sealed class GitHubRepositoryReadService
         public required string Content { get; init; }
 
         public required string Encoding { get; init; }
+    }
+
+    private sealed record MatchingFlags
+    {
+        public bool? HasMatchingUatVersion { get; init; }
+
+        public bool? HasMatchingPrdVersion { get; init; }
     }
 }
