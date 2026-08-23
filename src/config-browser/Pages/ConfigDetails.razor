@@ -69,179 +69,229 @@ else
                 }
             </div>
 
-            <div class="detail-card detail-card-wide">
-                <div class="section-heading">
-                    <h2>Overview</h2>
-                </div>
-                <dl class="overview-grid">
-                    <div>
-                        <dt>Operation unit</dt>
-                        <dd>@DisplayValue(selectedConfig.OperationUnit)</dd>
-                    </div>
-                    <div>
-                        <dt>Channel</dt>
-                        <dd>@DisplayValue(selectedConfig.Channel)</dd>
-                    </div>
-                    <div>
-                        <dt>Trigger</dt>
-                        <dd>@DisplayValue(selectedConfig.Trigger)</dd>
-                    </div>
-                    <div>
-                        <dt>Connector</dt>
-                        <dd>@DisplayValue(selectedConfig.Connector)</dd>
-                    </div>
-                    <div>
-                        <dt>Output type</dt>
-                        <dd>@DisplayValue(selectedConfig.OutputType)</dd>
-                    </div>
-                    <div>
-                        <dt>Generated file</dt>
-                        <dd>@selectedEntry.OutputFile</dd>
-                    </div>
-                    <div>
-                        <dt>@GetMatchFieldLabel(selectedEntry)</dt>
-                        <dd>@GetMatchFieldValue(selectedEntry)</dd>
-                    </div>
-                </dl>
-            </div>
-
-            @if (selectedConfig.Condition is not null)
-            {
-                <div class="detail-card detail-card-wide">
-                    <h2>Condition</h2>
-                    <p class="condition-description">@DisplayValue(selectedConfig.Condition.Description)</p>
-                    <pre>@selectedConfig.Condition.Expression</pre>
-                </div>
-            }
-
-            <div class="detail-card detail-card-wide">
-                <div class="section-heading">
-                    <h2>Input data</h2>
-                    <span>@selectedConfig.InputData.Count field(s)</span>
-                </div>
-
-                @if (selectedConfig.InputData.Count == 0)
-                {
-                    <p class="section-empty">No input fields are defined for this config.</p>
-                }
-                else
-                {
-                    <div class="table-wrap">
-                        <table class="detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Path</th>
-                                    <th>Required</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var input in selectedConfig.InputData)
-                                {
-                                    <tr>
-                                        <td>@DisplayValue(input.Name)</td>
-                                        <td>@DisplayValue(input.Type)</td>
-                                        <td><code>@DisplayValue(input.Path)</code></td>
-                                        <td>@(input.Required == true ? "Yes" : "No")</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-
-            <div class="detail-card detail-card-wide">
-                <div class="section-heading">
-                    <h2>Mappings</h2>
-                    <span>@selectedConfig.Mapping.Count mapping(s)</span>
-                </div>
-
-                @if (selectedConfig.Mapping.Count == 0)
-                {
-                    <p class="section-empty">No mappings are defined for this config.</p>
-                }
-                else
-                {
-                    <div class="table-wrap">
-                        <table class="detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Input field</th>
-                                    <th>Output field</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var mapping in selectedConfig.Mapping)
-                                {
-                                    <tr>
-                                        <td><code>@DisplayValue(mapping.InputField)</code></td>
-                                        <td>@DisplayValue(mapping.OutputField)</td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            </div>
-
-            <div class="detail-card detail-card-wide">
-                <div class="section-heading">
-                    <h2>Git history</h2>
-                    <span>@selectedEntry.Modifications.Count commit(s)</span>
-                </div>
-
-                @if (selectedEntry.Modifications.Count == 0)
-                {
-                    <p class="section-empty">No git history is available for this source file.</p>
-                }
-                else
-                {
-                    <div class="table-wrap">
-                        <table class="detail-table">
-                            <thead>
-                                <tr>
-                                    <th>Message</th>
-                                    <th>Author</th>
-                                    <th>Date</th>
-                                    <th>Commit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                 @foreach (var modification in selectedEntry.Modifications)
-                                 {
-                                     <tr>
-                                         <td class="history-message-cell">@modification.Message</td>
-                                         <td>@modification.AuthorName</td>
-                                         <td>@modification.AuthorDate.ToLocalTime():g</td>
-                                         <td>
-                                             <a class="history-commit-link" href="@BuildCommitUrl(modification.Commit)" target="_blank" rel="noreferrer">
-                                                 <code>@modification.Commit[..8]</code>
-                                             </a>
-                                         </td>
-                                     </tr>
-                                 }
-                             </tbody>
-                         </table>
-                    </div>
-                }
-            </div>
-
-            @if (selectedConfig.AdditionalProperties.Count > 0)
-            {
-                <div class="detail-card detail-card-wide">
-                    <h2>Additional sections</h2>
-
-                    @foreach (var property in selectedConfig.AdditionalProperties.OrderBy(static property => property.Key, StringComparer.OrdinalIgnoreCase))
+            <div class="detail-card detail-card-wide tabbed-details-card">
+                <div class="details-tabs" role="tablist" aria-label="Config detail sections">
+                    <button type="button"
+                            class="@GetTabButtonClass(DetailTab.Overview)"
+                            role="tab"
+                            aria-selected="@IsSelectedTab(DetailTab.Overview)"
+                            @onclick="@(() => SelectTab(DetailTab.Overview))">
+                        Overview
+                    </button>
+                    <button type="button"
+                            class="@GetTabButtonClass(DetailTab.InputData)"
+                            role="tab"
+                            aria-selected="@IsSelectedTab(DetailTab.InputData)"
+                            @onclick="@(() => SelectTab(DetailTab.InputData))">
+                        Input data
+                        <span>@selectedConfig.InputData.Count</span>
+                    </button>
+                    <button type="button"
+                            class="@GetTabButtonClass(DetailTab.Mappings)"
+                            role="tab"
+                            aria-selected="@IsSelectedTab(DetailTab.Mappings)"
+                            @onclick="@(() => SelectTab(DetailTab.Mappings))">
+                        Mappings
+                        <span>@selectedConfig.Mapping.Count</span>
+                    </button>
+                    <button type="button"
+                            class="@GetTabButtonClass(DetailTab.History)"
+                            role="tab"
+                            aria-selected="@IsSelectedTab(DetailTab.History)"
+                            @onclick="@(() => SelectTab(DetailTab.History))">
+                        Git history
+                        <span>@selectedEntry.Modifications.Count</span>
+                    </button>
+                    @if (selectedConfig.AdditionalProperties.Count > 0)
                     {
-                        <details class="json-section">
-                            <summary>@property.Key</summary>
-                            <pre>@FormatJson(property.Value)</pre>
-                        </details>
+                        <button type="button"
+                                class="@GetTabButtonClass(DetailTab.Additional)"
+                                role="tab"
+                                aria-selected="@IsSelectedTab(DetailTab.Additional)"
+                                @onclick="@(() => SelectTab(DetailTab.Additional))">
+                            Additional
+                            <span>@selectedConfig.AdditionalProperties.Count</span>
+                        </button>
                     }
                 </div>
-            }
+
+                <div class="tab-panel" role="tabpanel">
+                    @if (selectedTab == DetailTab.Overview)
+                    {
+                        <div class="section-heading">
+                            <h2>Overview</h2>
+                        </div>
+                        <dl class="overview-grid">
+                            <div>
+                                <dt>Operation unit</dt>
+                                <dd>@DisplayValue(selectedConfig.OperationUnit)</dd>
+                            </div>
+                            <div>
+                                <dt>Channel</dt>
+                                <dd>@DisplayValue(selectedConfig.Channel)</dd>
+                            </div>
+                            <div>
+                                <dt>Trigger</dt>
+                                <dd>@DisplayValue(selectedConfig.Trigger)</dd>
+                            </div>
+                            <div>
+                                <dt>Connector</dt>
+                                <dd>@DisplayValue(selectedConfig.Connector)</dd>
+                            </div>
+                            <div>
+                                <dt>Output type</dt>
+                                <dd>@DisplayValue(selectedConfig.OutputType)</dd>
+                            </div>
+                            <div>
+                                <dt>Generated file</dt>
+                                <dd>@selectedEntry.OutputFile</dd>
+                            </div>
+                            <div>
+                                <dt>@GetMatchFieldLabel(selectedEntry)</dt>
+                                <dd>@GetMatchFieldValue(selectedEntry)</dd>
+                            </div>
+                        </dl>
+
+                        @if (selectedConfig.Condition is not null)
+                        {
+                            <section class="tab-section">
+                                <h2>Condition</h2>
+                                <p class="condition-description">@DisplayValue(selectedConfig.Condition.Description)</p>
+                                <pre>@selectedConfig.Condition.Expression</pre>
+                            </section>
+                        }
+                    }
+                    else if (selectedTab == DetailTab.InputData)
+                    {
+                        <div class="section-heading">
+                            <h2>Input data</h2>
+                            <span>@selectedConfig.InputData.Count field(s)</span>
+                        </div>
+
+                        @if (selectedConfig.InputData.Count == 0)
+                        {
+                            <p class="section-empty">No input fields are defined for this config.</p>
+                        }
+                        else
+                        {
+                            <div class="table-wrap">
+                                <table class="detail-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Path</th>
+                                            <th>Required</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var input in selectedConfig.InputData)
+                                        {
+                                            <tr>
+                                                <td>@DisplayValue(input.Name)</td>
+                                                <td>@DisplayValue(input.Type)</td>
+                                                <td><code>@DisplayValue(input.Path)</code></td>
+                                                <td>@(input.Required == true ? "Yes" : "No")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                    else if (selectedTab == DetailTab.Mappings)
+                    {
+                        <div class="section-heading">
+                            <h2>Mappings</h2>
+                            <span>@selectedConfig.Mapping.Count mapping(s)</span>
+                        </div>
+
+                        @if (selectedConfig.Mapping.Count == 0)
+                        {
+                            <p class="section-empty">No mappings are defined for this config.</p>
+                        }
+                        else
+                        {
+                            <div class="table-wrap">
+                                <table class="detail-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Input field</th>
+                                            <th>Output field</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var mapping in selectedConfig.Mapping)
+                                        {
+                                            <tr>
+                                                <td><code>@DisplayValue(mapping.InputField)</code></td>
+                                                <td>@DisplayValue(mapping.OutputField)</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                    else if (selectedTab == DetailTab.History)
+                    {
+                        <div class="section-heading">
+                            <h2>Git history</h2>
+                            <span>@selectedEntry.Modifications.Count commit(s)</span>
+                        </div>
+
+                        @if (selectedEntry.Modifications.Count == 0)
+                        {
+                            <p class="section-empty">No git history is available for this source file.</p>
+                        }
+                        else
+                        {
+                            <div class="table-wrap">
+                                <table class="detail-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Message</th>
+                                            <th>Author</th>
+                                            <th>Date</th>
+                                            <th>Commit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var modification in selectedEntry.Modifications)
+                                        {
+                                            <tr>
+                                                <td class="history-message-cell">@modification.Message</td>
+                                                <td>@modification.AuthorName</td>
+                                                <td>@modification.AuthorDate.ToLocalTime():g</td>
+                                                <td>
+                                                    <a class="history-commit-link" href="@BuildCommitUrl(modification.Commit)" target="_blank" rel="noreferrer">
+                                                        <code>@modification.Commit[..8]</code>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    }
+                    else if (selectedTab == DetailTab.Additional)
+                    {
+                        <div class="section-heading">
+                            <h2>Additional sections</h2>
+                            <span>@selectedConfig.AdditionalProperties.Count section(s)</span>
+                        </div>
+
+                        @foreach (var property in selectedConfig.AdditionalProperties.OrderBy(static property => property.Key, StringComparer.OrdinalIgnoreCase))
+                        {
+                            <details class="json-section">
+                                <summary>@property.Key</summary>
+                                <pre>@FormatJson(property.Value)</pre>
+                            </details>
+                        }
+                    }
+                </div>
+            </div>
         </section>
     </div>
 
@@ -277,6 +327,15 @@ else
 }
 
 @code {
+    private enum DetailTab
+    {
+        Overview,
+        InputData,
+        Mappings,
+        History,
+        Additional
+    }
+
     [Parameter]
     [SupplyParameterFromQuery(Name = "path")]
     public string? Path { get; set; }
@@ -293,6 +352,7 @@ else
     private bool isPromoting;
     private bool requiresSignIn;
     private bool showPromoteModal;
+    private DetailTab selectedTab = DetailTab.Overview;
     private string? errorMessage;
     private string? promotionErrorMessage;
     private string? promotionMessage;
@@ -327,6 +387,7 @@ else
         promotionMessage = null;
         promotionPullRequestUrl = null;
         showPromoteModal = false;
+        selectedTab = DetailTab.Overview;
         selectedEntry = null;
         selectedConfig = null;
         selectedRepository = null;
@@ -389,6 +450,13 @@ else
 
     private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private void SelectTab(DetailTab tab) => selectedTab = tab;
+
+    private bool IsSelectedTab(DetailTab tab) => selectedTab == tab;
+
+    private string GetTabButtonClass(DetailTab tab) =>
+        selectedTab == tab ? "details-tab active" : "details-tab";
 
     private string GetAppOrigin() =>
         NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority);
