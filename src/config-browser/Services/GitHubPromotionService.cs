@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using config_browser.Models;
@@ -10,6 +11,7 @@ namespace config_browser.Services;
 internal sealed class GitHubPromotionService
 {
     private const string AuthSessionStorageKey = "config-browser.github-auth-session";
+    internal const string AuthSessionResponseHeaderName = "X-Config-Auth-Session";
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     private readonly HttpClient _httpClient;
@@ -43,6 +45,36 @@ internal sealed class GitHubPromotionService
     public async Task SignOutAsync() =>
         await ClearAuthSessionAsync();
 
+    public async Task<HttpRequestMessage> CreateAuthenticatedRequestAsync(
+        HttpMethod method,
+        string requestUri,
+        string missingSessionMessage)
+    {
+        var authSession = await GetAuthSessionAsync();
+
+        if (string.IsNullOrWhiteSpace(authSession))
+        {
+            throw new GitHubAuthenticationRequiredException(missingSessionMessage);
+        }
+
+        var request = new HttpRequestMessage(method, requestUri);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", authSession);
+        return request;
+    }
+
+    public async Task UpdateAuthSessionAsync(string? authSession)
+    {
+        if (string.IsNullOrWhiteSpace(authSession))
+        {
+            return;
+        }
+
+        await SetAuthSessionAsync(authSession);
+    }
+
+    public async Task InvalidateAuthSessionAsync() =>
+        await ClearAuthSessionAsync();
+
     public async Task<PromotionResult> PromoteAsync(
         GitHubRepository repository,
         ConfigCatalogEntry entry,
@@ -67,7 +99,7 @@ internal sealed class GitHubPromotionService
         if (response.StatusCode is HttpStatusCode.Unauthorized or HttpStatusCode.Forbidden)
         {
             await ClearAuthSessionAsync();
-            throw new InvalidOperationException("Your GitHub sign-in session expired or was rejected. Sign in again and retry the promotion.");
+            throw new GitHubAuthenticationRequiredException("Your GitHub sign-in session expired or was rejected. Sign in again and retry the promotion.");
         }
 
         if (!response.IsSuccessStatusCode)

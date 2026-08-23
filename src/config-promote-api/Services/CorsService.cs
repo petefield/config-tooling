@@ -26,7 +26,8 @@ internal sealed class CorsService
 
         response.Headers.Add("Access-Control-Allow-Origin", origin);
         response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept");
+        response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization");
+        response.Headers.Add("Access-Control-Expose-Headers", "X-Config-Auth-Session");
         response.Headers.Add("Vary", "Origin");
     }
 

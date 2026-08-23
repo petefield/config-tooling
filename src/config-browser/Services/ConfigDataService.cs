@@ -13,14 +13,16 @@ internal sealed class ConfigDataService
     private readonly Dictionary<string, IReadOnlyList<GitModification>> _gitHistoryCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _rawConfigCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly HttpClient _httpClient;
+    private readonly GitHubPromotionService _promotionService;
     private readonly string _promoteApiBaseUrl;
     private readonly GitHubRepository _repository;
 
     private ConfigCatalog? _catalog;
 
-    public ConfigDataService(HttpClient httpClient, IConfiguration configuration)
+    public ConfigDataService(HttpClient httpClient, GitHubPromotionService promotionService, IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _promotionService = promotionService;
         _promoteApiBaseUrl = configuration["PromoteApiBaseUrl"]?.TrimEnd('/')
             ?? throw new InvalidOperationException("The browser app is missing PromoteApiBaseUrl in appsettings.json.");
         _repository = configuration.GetSection("Repository").Get<GitHubRepository>()
@@ -34,8 +36,7 @@ internal sealed class ConfigDataService
             return _catalog;
         }
 
-        using var response = await _httpClient.GetAsync(BuildCatalogApiUrl());
-        response.EnsureSuccessStatusCode();
+        using var response = await SendAuthenticatedGetAsync(BuildCatalogApiUrl());
 
         var apiCatalog = await ReadJsonAsync<ConfigCatalogResponse>(
                 response,
@@ -77,8 +78,7 @@ internal sealed class ConfigDataService
             return cachedHistory;
         }
 
-        using var response = await _httpClient.GetAsync(BuildHistoryApiUrl(sourceFile));
-        response.EnsureSuccessStatusCode();
+        using var response = await SendAuthenticatedGetAsync(BuildHistoryApiUrl(sourceFile));
 
         var history = await ReadJsonAsync<List<GitModification>>(
                 response,
@@ -166,8 +166,7 @@ internal sealed class ConfigDataService
             return cachedConfig;
         }
 
-        using var response = await _httpClient.GetAsync(BuildFileApiUrl(outputFile));
-        response.EnsureSuccessStatusCode();
+        using var response = await SendAuthenticatedGetAsync(BuildFileApiUrl(outputFile));
 
         var rawConfig = await response.Content.ReadAsStringAsync();
 
@@ -188,6 +187,33 @@ internal sealed class ConfigDataService
 
     private string BuildHistoryApiUrl(string sourceFile) =>
         $"{_promoteApiBaseUrl}/api/configs/history?owner={Uri.EscapeDataString(_repository.Owner)}&repo={Uri.EscapeDataString(_repository.Name)}&branch={Uri.EscapeDataString(_repository.BaseBranch)}&path={Uri.EscapeDataString(sourceFile)}";
+
+    private async Task<HttpResponseMessage> SendAuthenticatedGetAsync(string requestUri)
+    {
+        using var request = await _promotionService.CreateAuthenticatedRequestAsync(
+            HttpMethod.Get,
+            requestUri,
+            "Sign in with GitHub before browsing configs.");
+        var response = await _httpClient.SendAsync(request);
+
+        await _promotionService.UpdateAuthSessionAsync(ReadUpdatedAuthSession(response));
+
+        if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden)
+        {
+            response.Dispose();
+            await _promotionService.InvalidateAuthSessionAsync();
+            throw new GitHubAuthenticationRequiredException("Your GitHub sign-in session expired or was rejected. Sign in again to continue browsing configs.");
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var message = await ReadErrorAsync(response);
+            response.Dispose();
+            throw new InvalidOperationException(message);
+        }
+
+        return response;
+    }
 
     private static string BuildTenantFileKey(string tenant, string fileName, string environment) =>
         $"{tenant}/{environment}/{fileName}";
@@ -219,6 +245,29 @@ internal sealed class ConfigDataService
         {
             throw new InvalidOperationException(invalidJsonMessage, exception);
         }
+    }
+
+    private static string? ReadUpdatedAuthSession(HttpResponseMessage response) =>
+        response.Headers.TryGetValues(GitHubPromotionService.AuthSessionResponseHeaderName, out var values)
+            ? values.FirstOrDefault()
+            : null;
+
+    private static async Task<string> ReadErrorAsync(HttpResponseMessage response)
+    {
+        try
+        {
+            var error = await response.Content.ReadFromJsonAsync<PromoteApiError>();
+
+            if (!string.IsNullOrWhiteSpace(error?.Message))
+            {
+                return error.Message.Trim();
+            }
+        }
+        catch (JsonException)
+        {
+        }
+
+        return $"Promote API returned {(int)response.StatusCode} {response.ReasonPhrase}.";
     }
 
     private static ConfigCatalogEntry MapToCatalogEntry(ConfigCatalogItem entry)
@@ -259,5 +308,10 @@ internal sealed class ConfigDataService
         public required string ContactType { get; init; }
 
         public required string Channel { get; init; }
+    }
+
+    private sealed record PromoteApiError
+    {
+        public string? Message { get; init; }
     }
 }

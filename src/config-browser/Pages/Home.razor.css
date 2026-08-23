@@ -227,6 +227,25 @@
     border-color: #e0b9bf;
 }
 
+.state-actions {
+    margin-top: 1rem;
+}
+
+.sign-in-button {
+    background: linear-gradient(180deg, #1f66c7 0%, #1654a7 100%);
+    border: 1px solid #12488f;
+    border-radius: 8px;
+    color: #ffffff;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 600;
+    padding: 0.7rem 1.1rem;
+}
+
+.sign-in-button:hover {
+    background: linear-gradient(180deg, #1d5eb8 0%, #144b95 100%);
+}
+
 @media (max-width: 900px) {
     .hero-card {
         flex-direction: column;

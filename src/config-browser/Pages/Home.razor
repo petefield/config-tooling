@@ -1,5 +1,6 @@
 @page "/"
 @inject ConfigDataService DataService
+@inject GitHubPromotionService PromotionService
 @inject NavigationManager NavigationManager
 
 <PageTitle>Config Browser</PageTitle>
@@ -9,6 +10,16 @@
     <section class="state-card">
         <h1>Loading config catalog</h1>
         <p>Reading the generated config index and available files.</p>
+    </section>
+}
+else if (requiresSignIn)
+{
+    <section class="state-card">
+        <h1>Sign in required</h1>
+        <p>@signInMessage</p>
+        <div class="state-actions">
+            <button type="button" class="sign-in-button" @onclick="SignInAsync">Sign in with GitHub</button>
+        </div>
     </section>
 }
 else if (errorMessage is not null)
@@ -144,7 +155,9 @@ else
 
     private ConfigCatalog? catalog;
     private bool isLoading = true;
+    private bool requiresSignIn;
     private string? errorMessage;
+    private string signInMessage = "Sign in with GitHub to browse config data.";
     private string selectedTenant = AllOption;
     private string selectedEnvironment = AllOption;
     private string selectedContactType = AllOption;
@@ -214,17 +227,50 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadCatalogAsync();
+    }
+
+    private async Task LoadCatalogAsync()
+    {
+        isLoading = true;
+        requiresSignIn = false;
+        errorMessage = null;
+
         try
         {
             catalog = await DataService.GetCatalogAsync();
         }
+        catch (GitHubAuthenticationRequiredException exception)
+        {
+            catalog = null;
+            requiresSignIn = true;
+            signInMessage = exception.Message;
+        }
         catch (Exception exception)
         {
+            catalog = null;
             errorMessage = exception.Message;
         }
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task SignInAsync()
+    {
+        signInMessage = "Sign in with GitHub to browse config data.";
+
+        try
+        {
+            await PromotionService.SignInAsync(GetAppOrigin());
+            await LoadCatalogAsync();
+        }
+        catch (Exception exception)
+        {
+            requiresSignIn = true;
+            isLoading = false;
+            signInMessage = exception.Message;
         }
     }
 
@@ -239,6 +285,9 @@ else
 
     private static string FormatContactTypeOptionLabel(string value) =>
         value == AllOption ? "All" : value;
+
+    private string GetAppOrigin() =>
+        NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority);
 
     private bool MatchesTenant(ConfigCatalogEntry entry) =>
         selectedTenant == AllOption ||

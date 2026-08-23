@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using config_promote_api.Models;
 using config_promote_api.Services;
 using Microsoft.AspNetCore.Http;
@@ -9,13 +10,16 @@ namespace config_promote_api.Functions;
 
 internal sealed class ConfigReadFunctions
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
     private readonly CorsService _corsService;
     private readonly GitHubRepositoryReadService _readService;
+    private readonly GitHubUserTokenService _tokenService;
 
-    public ConfigReadFunctions(CorsService corsService, GitHubRepositoryReadService readService)
+    public ConfigReadFunctions(CorsService corsService, GitHubRepositoryReadService readService, GitHubUserTokenService tokenService)
     {
         _corsService = corsService;
         _readService = readService;
+        _tokenService = tokenService;
     }
 
     [Function("ReadConfigCatalog")]
@@ -29,9 +33,14 @@ internal sealed class ConfigReadFunctions
 
         try
         {
+            var authSession = await GetAuthenticatedSessionAsync(request);
             var repository = ReadRepository(request);
-            var result = await _readService.GetCatalogAsync(repository);
-            return await CreateJsonAsync(request, HttpStatusCode.OK, result);
+            var result = await _readService.GetCatalogAsync(repository, authSession.AccessToken);
+            return await CreateJsonAsync(request, HttpStatusCode.OK, result, authSession.AuthSession);
+        }
+        catch (AuthenticationRequiredException exception)
+        {
+            return await CreateJsonAsync(request, HttpStatusCode.Unauthorized, new ApiErrorResponse { Message = exception.Message });
         }
         catch (Exception exception)
         {
@@ -50,15 +59,21 @@ internal sealed class ConfigReadFunctions
 
         try
         {
+            var authSession = await GetAuthenticatedSessionAsync(request);
             var repository = ReadRepository(request);
             var outputFile = GetRequiredQueryValue(request, "path");
-            var rawContent = await _readService.GetRawConfigByOutputFileAsync(repository, outputFile);
+            var rawContent = await _readService.GetRawConfigByOutputFileAsync(repository, outputFile, authSession.AccessToken);
 
             var response = request.CreateResponse(HttpStatusCode.OK);
             _corsService.Apply(request, response);
+            response.Headers.Add("X-Config-Auth-Session", authSession.AuthSession);
             response.Headers.Add("Content-Type", "application/json; charset=utf-8");
             await response.WriteStringAsync(rawContent);
             return response;
+        }
+        catch (AuthenticationRequiredException exception)
+        {
+            return await CreateJsonAsync(request, HttpStatusCode.Unauthorized, new ApiErrorResponse { Message = exception.Message });
         }
         catch (Exception exception)
         {
@@ -77,10 +92,15 @@ internal sealed class ConfigReadFunctions
 
         try
         {
+            var authSession = await GetAuthenticatedSessionAsync(request);
             var repository = ReadRepository(request);
             var sourceFile = GetRequiredQueryValue(request, "path");
-            var history = await _readService.GetHistoryAsync(repository, sourceFile);
-            return await CreateJsonAsync(request, HttpStatusCode.OK, history);
+            var history = await _readService.GetHistoryAsync(repository, sourceFile, authSession.AccessToken);
+            return await CreateJsonAsync(request, HttpStatusCode.OK, history, authSession.AuthSession);
+        }
+        catch (AuthenticationRequiredException exception)
+        {
+            return await CreateJsonAsync(request, HttpStatusCode.Unauthorized, new ApiErrorResponse { Message = exception.Message });
         }
         catch (Exception exception)
         {
@@ -109,6 +129,30 @@ internal sealed class ConfigReadFunctions
         return value;
     }
 
+    private async Task<GitHubUserTokenService.AuthenticatedGitHubSession> GetAuthenticatedSessionAsync(HttpRequestData request)
+    {
+        if (!request.Headers.TryGetValues("Authorization", out var values))
+        {
+            throw new AuthenticationRequiredException("Sign in with GitHub before browsing configs.");
+        }
+
+        var authorization = values.FirstOrDefault();
+
+        if (string.IsNullOrWhiteSpace(authorization) || !authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new AuthenticationRequiredException("Sign in with GitHub before browsing configs.");
+        }
+
+        var authSessionToken = authorization["Bearer ".Length..].Trim();
+
+        if (string.IsNullOrWhiteSpace(authSessionToken))
+        {
+            throw new AuthenticationRequiredException("Sign in with GitHub before browsing configs.");
+        }
+
+        return await _tokenService.GetAuthenticatedSessionAsync(authSessionToken);
+    }
+
     private HttpResponseData CreateEmpty(HttpRequestData request)
     {
         var response = request.CreateResponse(HttpStatusCode.NoContent);
@@ -116,12 +160,18 @@ internal sealed class ConfigReadFunctions
         return response;
     }
 
-    private async Task<HttpResponseData> CreateJsonAsync(HttpRequestData request, HttpStatusCode statusCode, object body)
+    private async Task<HttpResponseData> CreateJsonAsync(HttpRequestData request, HttpStatusCode statusCode, object body, string? authSession = null)
     {
         var response = request.CreateResponse(statusCode);
         _corsService.Apply(request, response);
+
+        if (!string.IsNullOrWhiteSpace(authSession))
+        {
+            response.Headers.Add("X-Config-Auth-Session", authSession);
+        }
+
         response.Headers.Add("Content-Type", "application/json; charset=utf-8");
-        await response.WriteAsJsonAsync(body);
+        await response.WriteStringAsync(JsonSerializer.Serialize(body, JsonOptions));
         return response;
     }
 }

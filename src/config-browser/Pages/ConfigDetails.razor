@@ -14,6 +14,14 @@
         <p>Fetching the selected generated config file.</p>
     </section>
 }
+else if (requiresSignIn)
+{
+    <section class="state-card">
+        <h1>Sign in required</h1>
+        <p>@signInMessage</p>
+        <button type="button" class="promote-button" @onclick="SignInToBrowseAsync">Sign in with GitHub</button>
+    </section>
+}
 else if (errorMessage is not null)
 {
     <section class="state-card error-state">
@@ -249,10 +257,12 @@ else
     private ConfigDocument? selectedConfig;
     private bool isLoading = true;
     private bool isPromoting;
+    private bool requiresSignIn;
     private string? errorMessage;
     private string? promotionErrorMessage;
     private string? promotionMessage;
     private string? promotionPullRequestUrl;
+    private string signInMessage = "Sign in with GitHub to browse config data.";
 
     private string PageTitleText =>
         selectedEntry is null
@@ -270,7 +280,13 @@ else
 
     protected override async Task OnParametersSetAsync()
     {
+        await LoadConfigAsync();
+    }
+
+    private async Task LoadConfigAsync()
+    {
         isLoading = true;
+        requiresSignIn = false;
         errorMessage = null;
         promotionErrorMessage = null;
         promotionMessage = null;
@@ -301,6 +317,11 @@ else
             };
             selectedConfig = await DataService.GetConfigAsync(selectedEntry.OutputFile);
         }
+        catch (GitHubAuthenticationRequiredException exception)
+        {
+            requiresSignIn = true;
+            signInMessage = exception.Message;
+        }
         catch (Exception exception)
         {
             errorMessage = exception.Message;
@@ -311,8 +332,26 @@ else
         }
     }
 
+    private async Task SignInToBrowseAsync()
+    {
+        try
+        {
+            await PromotionService.SignInAsync(GetAppOrigin());
+            await LoadConfigAsync();
+        }
+        catch (Exception exception)
+        {
+            requiresSignIn = true;
+            isLoading = false;
+            signInMessage = exception.Message;
+        }
+    }
+
     private static string DisplayValue(string? value) =>
         string.IsNullOrWhiteSpace(value) ? "—" : value;
+
+    private string GetAppOrigin() =>
+        NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority);
 
     private static string GetMatchFieldLabel(ConfigCatalogEntry entry) =>
         string.Equals(entry.Environment, "dev", StringComparison.OrdinalIgnoreCase)
