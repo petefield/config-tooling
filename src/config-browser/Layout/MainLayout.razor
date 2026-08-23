@@ -37,17 +37,20 @@
     </aside>
 
     <div class="app-workspace">
-        <header class="workspace-header">
-            <div class="workspace-header-copy">
-                <div class="workspace-title">@(IsDetailsPage ? "Configuration Detail Workspace" : "Configuration Control Center")</div>
-                <p class="workspace-summary">Structured review and controlled promotion for live GitHub-managed configuration.</p>
-            </div>
+        @if (!IsDetailsPage)
+        {
+            <header class="workspace-header">
+                <div class="workspace-header-copy">
+                    <div class="workspace-title">Configuration Control Center</div>
+                    <p class="workspace-summary">Structured review and controlled promotion for live GitHub-managed configuration.</p>
+                </div>
 
-            <div class="workspace-meta">
-                <span class="workspace-pill">GitHub-backed</span>
-                <span class="workspace-pill">Sign-in required</span>
-            </div>
-        </header>
+                <div class="workspace-meta">
+                    <span class="workspace-pill">GitHub-backed</span>
+                    <span class="workspace-pill">Sign-in required</span>
+                </div>
+            </header>
+        }
 
         <main class="app-main">
             @Body
