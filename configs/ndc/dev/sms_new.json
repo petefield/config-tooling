@@ -34,7 +34,7 @@
             "outputField": "templateId"
         },
         {
-            "inputField": "#ProactiveLimitIncreaseValidated",
+            "inputField": "#TestCommunicationId",
             "outputField": "CommunicationId"
         },
         {
