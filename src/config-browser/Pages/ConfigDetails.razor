@@ -1,7 +1,9 @@
 @page "/config"
 @using System.Text.Json
 @inject ConfigDataService DataService
+@inject GitHubPromotionService PromotionService
 @inject IJSRuntime JsRuntime
+@inject NavigationManager NavigationManager
 
 <PageTitle>@PageTitleText</PageTitle>
 
@@ -42,7 +44,22 @@ else
             </div>
 
             <div class="detail-toolbar detail-card detail-card-wide">
-                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote)">@GetPromoteButtonLabel(selectedEntry)</button>
+                <button type="button" class="promote-button" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote || isPromoting)">@GetPromoteButtonLabel(selectedEntry, isPromoting)</button>
+
+                @if (promotionErrorMessage is not null)
+                {
+                    <p class="toolbar-message toolbar-message-error">@promotionErrorMessage</p>
+                }
+                else if (promotionMessage is not null)
+                {
+                    <p class="toolbar-message">
+                        @promotionMessage
+                        @if (promotionPullRequestUrl is not null)
+                        {
+                            <a href="@promotionPullRequestUrl" target="_blank" rel="noreferrer">Open PR</a>
+                        }
+                    </p>
+                }
             </div>
 
             <div class="detail-card detail-card-wide">
@@ -231,7 +248,11 @@ else
     private ConfigCatalogEntry? selectedEntry;
     private ConfigDocument? selectedConfig;
     private bool isLoading = true;
+    private bool isPromoting;
     private string? errorMessage;
+    private string? promotionErrorMessage;
+    private string? promotionMessage;
+    private string? promotionPullRequestUrl;
 
     private string PageTitleText =>
         selectedEntry is null
@@ -251,6 +272,9 @@ else
     {
         isLoading = true;
         errorMessage = null;
+        promotionErrorMessage = null;
+        promotionMessage = null;
+        promotionPullRequestUrl = null;
         selectedEntry = null;
         selectedConfig = null;
 
@@ -267,10 +291,14 @@ else
 
             if (selectedEntry is null)
             {
-                errorMessage = $"The generated config '{Path}' was not found.";
+                errorMessage = $"The config '{Path}' was not found in GitHub.";
                 return;
             }
 
+            selectedEntry = selectedEntry with
+            {
+                Modifications = await DataService.GetGitHistoryAsync(selectedEntry.SourceFile)
+            };
             selectedConfig = await DataService.GetConfigAsync(selectedEntry.OutputFile);
         }
         catch (Exception exception)
@@ -300,7 +328,10 @@ else
                 ? entry.HasMatchingPrdVersion == true ? "Yes" : "No"
                 : "—";
 
-    private static string GetPromoteButtonLabel(ConfigCatalogEntry? entry) =>
+    private static string GetPromoteButtonLabel(ConfigCatalogEntry? entry, bool isPromoting) =>
+        isPromoting
+            ? "Creating PR..."
+            :
         entry is null
             ? "Promote"
             : $"Promote to {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}";
@@ -312,9 +343,51 @@ else
             return;
         }
 
-        await JsRuntime.InvokeAsync<bool>(
+        promotionErrorMessage = null;
+        promotionMessage = null;
+        promotionPullRequestUrl = null;
+
+        if (!await PromotionService.HasAuthenticatedSessionAsync())
+        {
+            try
+            {
+                await PromotionService.SignInAsync(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority));
+            }
+            catch (Exception exception)
+            {
+                promotionErrorMessage = exception.Message;
+                return;
+            }
+        }
+
+        var confirmed = await JsRuntime.InvokeAsync<bool>(
             "confirm",
             $"Promote '{selectedEntry.FileName}' for tenant '{selectedEntry.Tenant}' from {selectedEntry.Environment.ToUpperInvariant()} to {GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()}?");
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        isPromoting = true;
+
+        try
+        {
+            var catalog = await DataService.GetCatalogAsync();
+            var fileContents = await DataService.GetConfigTextAsync(selectedEntry.OutputFile);
+            var result = await PromotionService.PromoteAsync(catalog.Repository, selectedEntry, fileContents);
+
+            promotionPullRequestUrl = result.PullRequestUrl;
+            promotionMessage = $"Created branch '{result.BranchName}' and pull request #{result.PullRequestNumber}.";
+        }
+        catch (Exception exception)
+        {
+            promotionErrorMessage = exception.Message;
+        }
+        finally
+        {
+            isPromoting = false;
+        }
     }
 
     private static string GetPromotionTargetEnvironment(ConfigCatalogEntry entry) =>

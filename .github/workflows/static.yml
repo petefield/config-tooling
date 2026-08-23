@@ -6,7 +6,8 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "configs/**"
+      - ".github/workflows/static.yml"
+      - "src/config-browser/**"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -48,15 +49,11 @@ jobs:
 
       - name: Restore projects
         run: |
-          dotnet restore ./src/config-tooling/config-tooling.csproj
           dotnet restore ./src/config-browser/config-browser.csproj
 
       - name: Publish browser app
         working-directory: ./src/config-browser
         run: dotnet publish ./config-browser.csproj -c Release --no-restore -o ../../artifacts/config-browser
-
-      - name: Generate config data
-        run: dotnet run --no-restore --project ./src/config-tooling/config-tooling.csproj -- ./configs ./artifacts/config-browser/wwwroot/data/
 
       - name: Configure published site
         run: |

@@ -11,18 +11,23 @@ internal sealed class ConfigToolingApp
     };
 
     private readonly GitHistoryService _gitHistoryService;
+    private readonly GitRepositoryMetadataService _gitRepositoryMetadataService;
 
-    private ConfigToolingApp(GitHistoryService gitHistoryService)
+    private ConfigToolingApp(
+        GitHistoryService gitHistoryService,
+        GitRepositoryMetadataService gitRepositoryMetadataService)
     {
         _gitHistoryService = gitHistoryService;
+        _gitRepositoryMetadataService = gitRepositoryMetadataService;
     }
 
     public static Task<int> RunAsync(string[] args)
     {
         var options = AppOptions.Create(args, Directory.GetCurrentDirectory());
         var gitHistoryService = new GitHistoryService(options.RepositoryRoot);
+        var gitRepositoryMetadataService = new GitRepositoryMetadataService(options.RepositoryRoot);
 
-        return new ConfigToolingApp(gitHistoryService).RunAsync(options);
+        return new ConfigToolingApp(gitHistoryService, gitRepositoryMetadataService).RunAsync(options);
     }
 
     private async Task<int> RunAsync(AppOptions options)
@@ -48,6 +53,7 @@ internal sealed class ConfigToolingApp
 
         var filesCopied = 0;
         var fileHistories = new List<FileHistory>();
+        var repository = await _gitRepositoryMetadataService.GetRepositoryInfoAsync();
 
         foreach (var filePath in jsonFiles)
         {
@@ -55,7 +61,7 @@ internal sealed class ConfigToolingApp
             filesCopied += await ProcessConfigFileAsync(filePath, options, fileHistories);
         }
 
-        var historyIndexPath = await WriteHistoryIndexAsync(options.DestinationRoot, fileHistories);
+        var historyIndexPath = await WriteHistoryIndexAsync(options.DestinationRoot, repository, fileHistories);
 
         Console.WriteLine($"Copied {filesCopied} file(s) into {options.DestinationRoot}");
         Console.WriteLine($"Wrote history index to {historyIndexPath}");
@@ -68,7 +74,8 @@ internal sealed class ConfigToolingApp
         ICollection<FileHistory> fileHistories)
     {
         var fileContents = await File.ReadAllTextAsync(filePath);
-        var config = System.Text.Json.JsonSerializer.Deserialize<Config>(fileContents);
+        var config = System.Text.Json.JsonSerializer.Deserialize<Config>(fileContents)
+            ?? throw new InvalidOperationException($"Config file '{filePath}' could not be deserialized.");
         var relativeSourceFile = Path.GetRelativePath(options.RepositoryRoot, filePath);
         var modifications = await _gitHistoryService.GetFileHistoryAsync(relativeSourceFile);
         var copiesCreated = 0;
@@ -116,12 +123,14 @@ internal sealed class ConfigToolingApp
 
     private static async Task<string> WriteHistoryIndexAsync(
         string destinationRoot,
+        GitHubRepositoryInfo repository,
         List<FileHistory> fileHistories)
     {
         var historyIndexPath = Path.Combine(destinationRoot, "history-index.json");
         var historyIndex = new HistoryIndex
         {
             GeneratedAtUtc = DateTimeOffset.UtcNow,
+            Repository = repository,
             Files = fileHistories
         };
 

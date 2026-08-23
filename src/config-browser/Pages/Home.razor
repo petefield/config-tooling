@@ -22,15 +22,15 @@ else if (catalog is null || catalog.Entries.Count == 0)
 {
     <section class="state-card">
         <h1>No config files found</h1>
-        <p>Run the config tooling generator so the browser has data to display.</p>
+        <p>No config files were found in the configured GitHub repository.</p>
     </section>
 }
 else
 {
     <section class="hero-card">
         <div>
-            <h1>Generated config browser</h1>
-            <p>Filter by tenant and environment, then open any generated config for a clean detail view.</p>
+            <h1>Config browser</h1>
+            <p>Filter the live GitHub config repository by tenant, environment, and contact type, then open any config for a clean detail view.</p>
         </div>
 
         <dl class="hero-stats">
@@ -43,7 +43,7 @@ else
                 <dd>@TenantOptions.Count(option => option != AllOption)</dd>
             </div>
             <div>
-                <dt>Generated</dt>
+                <dt>Repo updated</dt>
                 <dd>@catalog.GeneratedAtUtc.ToLocalTime().ToString("g")</dd>
             </div>
         </dl>

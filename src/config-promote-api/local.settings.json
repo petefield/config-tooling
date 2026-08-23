@@ -1,0 +1,12 @@
+{
+   "IsEncrypted": false,
+   "Values": {
+     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+     "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated",
+     "GitHubAppClientId": "Iv23libI6BYKeKao3fKT",
+     "GitHubAppClientSecret": "b4d5221c37d6bd0385339900157361d8792e25b5",
+     "GitHubAppCallbackUrl": "http://localhost:7071/api/auth/github/callback",
+     "GitHubAppSessionKey": "TEB+ftiMxfVscYKX25as70UuUWD9A+dZzU32LFIzGa8=",
+     "GitHubAppAllowedOrigins": "http://localhost:5172"
+   }
+ }

@@ -87,7 +87,8 @@
 .detail-toolbar {
     align-items: center;
     display: flex;
-    justify-content: flex-end;
+    gap: 1rem;
+    justify-content: space-between;
     padding: 1rem 1.5rem;
 }
 
@@ -131,6 +132,27 @@
     border-color: #c4cfdb;
     color: #7c8ea2;
     cursor: not-allowed;
+}
+
+.toolbar-message {
+    color: #44627f;
+    margin: 0;
+}
+
+.toolbar-message a {
+    color: #1f5fbf;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    text-decoration: none;
+}
+
+.toolbar-message a:hover {
+    color: #144788;
+    text-decoration: underline;
+}
+
+.toolbar-message-error {
+    color: #b42318;
 }
 
 .section-heading {
@@ -214,5 +236,10 @@
     .details-grid,
     .overview-grid {
         grid-template-columns: 1fr;
+    }
+
+    .detail-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }

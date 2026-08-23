@@ -1,23 +1,29 @@
-﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using config_browser.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace config_browser.Services;
 
 internal sealed class ConfigDataService
 {
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+    private static readonly string[] ConfigPathPrefixes = ["configs"];
 
     private readonly Dictionary<string, ConfigDocument> _configCache = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, IReadOnlyList<GitModification>> _gitHistoryCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, string> _rawConfigCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly HttpClient _httpClient;
+    private readonly GitHubRepository _repository;
 
     private ConfigCatalog? _catalog;
 
-    public ConfigDataService(HttpClient httpClient)
+    public ConfigDataService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
+        _repository = configuration.GetSection("Repository").Get<GitHubRepository>()
+            ?? throw new InvalidOperationException("The browser app is missing Repository settings in appsettings.json.");
     }
 
     public async Task<ConfigCatalog> GetCatalogAsync()
@@ -27,30 +33,22 @@ internal sealed class ConfigDataService
             return _catalog;
         }
 
-        using var response = await _httpClient.GetAsync("data/history-index.json");
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            throw new InvalidOperationException(
-                "No generated config data was found. Run the config-tooling console app first so src/config-tooling/root contains fresh output.");
-        }
-
-        response.EnsureSuccessStatusCode();
-
-        var historyIndex = await ReadJsonAsync<ConfigHistoryIndex>(
-                response,
-                "The generated history index is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.")
-            ?? throw new InvalidOperationException("The generated history index could not be read.");
-
-        var entries = historyIndex.Files
-            .Select(MapToCatalogEntry)
+        var repositoryTree = await GetRepositoryTreeAsync();
+        var sourceFiles = repositoryTree.Tree
+            .Where(static entry => string.Equals(entry.Type, "blob", StringComparison.OrdinalIgnoreCase))
+            .Where(entry => IsConfigFile(entry.Path))
+            .OrderBy(static entry => entry.Path, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
+        var entries = await Task.WhenAll(sourceFiles.Select(MapToCatalogEntryAsync));
+
         await ApplyMatchingEnvironmentFlagsAsync(entries);
+        var latestCommitDate = await GetLatestCommitDateAsync();
 
         _catalog = new ConfigCatalog
         {
-            GeneratedAtUtc = historyIndex.GeneratedAtUtc,
+            GeneratedAtUtc = latestCommitDate,
+            Repository = _repository,
             Entries = entries
                 .OrderBy(static entry => entry.Tenant, StringComparer.OrdinalIgnoreCase)
                 .ThenBy(static entry => entry.Environment, StringComparer.OrdinalIgnoreCase)
@@ -69,6 +67,29 @@ internal sealed class ConfigDataService
             entry => string.Equals(entry.OutputFile, outputFile, StringComparison.OrdinalIgnoreCase));
     }
 
+    public async Task<IReadOnlyList<GitModification>> GetGitHistoryAsync(string sourceFile)
+    {
+        if (_gitHistoryCache.TryGetValue(sourceFile, out var cachedHistory))
+        {
+            return cachedHistory;
+        }
+
+        using var response = await SendGitHubGetAsync(BuildCommitsApiPath(sourceFile));
+        response.EnsureSuccessStatusCode();
+
+        var commits = await ReadJsonAsync<List<GitHubCommitResponse>>(
+                response,
+                $"GitHub did not return valid history for '{sourceFile}'.")
+            ?? [];
+
+        var modifications = commits
+            .Select(MapToGitModification)
+            .ToArray();
+
+        _gitHistoryCache[sourceFile] = modifications;
+        return modifications;
+    }
+
     public async Task<ConfigDocument> GetConfigAsync(string outputFile)
     {
         if (_configCache.TryGetValue(outputFile, out var cachedDocument))
@@ -79,12 +100,15 @@ internal sealed class ConfigDataService
         var rawConfig = await GetRawConfigAsync(outputFile);
         var config = DeserializeJson<ConfigDocument>(
                 rawConfig,
-                $"The generated config '{outputFile}' is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.")
-            ?? throw new InvalidOperationException($"The generated config '{outputFile}' could not be read.");
+                $"The GitHub config '{outputFile}' is missing or not valid JSON.")
+            ?? throw new InvalidOperationException($"The GitHub config '{outputFile}' could not be read.");
 
         _configCache[outputFile] = config;
         return config;
     }
+
+    public Task<string> GetConfigTextAsync(string outputFile) =>
+        GetRawConfigAsync(outputFile);
 
     private async Task ApplyMatchingEnvironmentFlagsAsync(ConfigCatalogEntry[] entries)
     {
@@ -143,7 +167,8 @@ internal sealed class ConfigDataService
             return cachedConfig;
         }
 
-        using var response = await _httpClient.GetAsync(BuildDataPath(outputFile));
+        var sourceFile = BuildSourceFilePath(outputFile);
+        using var response = await _httpClient.GetAsync(BuildRawContentUrl(sourceFile));
         response.EnsureSuccessStatusCode();
 
         var rawConfig = await response.Content.ReadAsStringAsync();
@@ -151,15 +176,100 @@ internal sealed class ConfigDataService
         if (string.IsNullOrWhiteSpace(rawConfig))
         {
             throw new InvalidOperationException(
-                $"The generated config '{outputFile}' is missing or not valid JSON. Rebuild or restart the browser app after generating src/config-tooling/root.");
+                $"The GitHub config '{outputFile}' is missing or not valid JSON.");
         }
 
         _rawConfigCache[outputFile] = rawConfig;
         return rawConfig;
     }
 
-    private static string BuildDataPath(string outputFile) =>
-        $"data/{string.Join("/", outputFile.Split('/').Select(Uri.EscapeDataString))}";
+    private async Task<GitHubTreeResponse> GetRepositoryTreeAsync()
+    {
+        using var response = await SendGitHubGetAsync(
+            $"https://api.github.com/repos/{_repository.Owner}/{_repository.Name}/git/trees/{Uri.EscapeDataString(_repository.BaseBranch)}?recursive=1");
+        response.EnsureSuccessStatusCode();
+
+        return await ReadJsonAsync<GitHubTreeResponse>(
+                   response,
+                   "GitHub did not return a valid repository tree for the config browser.")
+               ?? throw new InvalidOperationException("GitHub returned an empty repository tree for the config browser.");
+    }
+
+    private async Task<DateTimeOffset> GetLatestCommitDateAsync()
+    {
+        using var response = await SendGitHubGetAsync(
+            $"https://api.github.com/repos/{_repository.Owner}/{_repository.Name}/commits/{Uri.EscapeDataString(_repository.BaseBranch)}");
+        response.EnsureSuccessStatusCode();
+
+        var commit = await ReadJsonAsync<GitHubCommitResponse>(
+                         response,
+                         "GitHub did not return a valid latest commit for the config browser.")
+                     ?? throw new InvalidOperationException("GitHub returned an empty latest commit for the config browser.");
+
+        return commit.Commit.Author.Date;
+    }
+
+    private async Task<ConfigCatalogEntry> MapToCatalogEntryAsync(GitHubTreeEntry entry)
+    {
+        var sourceFile = entry.Path;
+        var outputFile = BuildOutputFilePath(sourceFile);
+        var config = await GetConfigAsync(outputFile);
+
+        var segments = outputFile.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        if (segments.Length < 3)
+        {
+            throw new InvalidOperationException($"Unexpected config output path '{outputFile}' derived from '{sourceFile}'.");
+        }
+
+        return new ConfigCatalogEntry
+        {
+            OutputFile = outputFile,
+            SourceFile = sourceFile,
+            ContactType = config.Trigger ?? "—",
+            Channel = config.Channel ?? "—",
+            Tenant = segments[0],
+            Environment = segments[1],
+            FileName = segments[^1],
+            Modifications = []
+        };
+    }
+
+    private string BuildRawContentUrl(string sourceFile) =>
+        $"https://raw.githubusercontent.com/{_repository.Owner}/{_repository.Name}/{Uri.EscapeDataString(_repository.BaseBranch)}/{string.Join("/", sourceFile.Split('/').Select(Uri.EscapeDataString))}";
+
+    private string BuildCommitsApiPath(string sourceFile) =>
+        $"https://api.github.com/repos/{_repository.Owner}/{_repository.Name}/commits?sha={Uri.EscapeDataString(_repository.BaseBranch)}&path={Uri.EscapeDataString(sourceFile)}&per_page=5";
+
+    private async Task<HttpResponseMessage> SendGitHubGetAsync(string requestUri)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+        request.Headers.Accept.ParseAdd("application/vnd.github+json");
+        return await _httpClient.SendAsync(request);
+    }
+
+    private static string BuildOutputFilePath(string sourceFile)
+    {
+        var segments = sourceFile.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (segments.Length < 4 || !ConfigPathPrefixes.Contains(segments[0], StringComparer.OrdinalIgnoreCase))
+        {
+            throw new InvalidOperationException($"Unexpected config source path '{sourceFile}'.");
+        }
+
+        return string.Join('/', segments.Skip(1));
+    }
+
+    private static string BuildSourceFilePath(string outputFile) =>
+        $"configs/{outputFile}";
+
+    private static bool IsConfigFile(string path)
+    {
+        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return segments.Length >= 4 &&
+               ConfigPathPrefixes.Contains(segments[0], StringComparer.OrdinalIgnoreCase) &&
+               path.EndsWith(".json", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static string BuildTenantFileKey(string tenant, string fileName, string environment) =>
         $"{tenant}/{environment}/{fileName}";
@@ -193,26 +303,63 @@ internal sealed class ConfigDataService
         }
     }
 
-    private static ConfigCatalogEntry MapToCatalogEntry(ConfigHistoryEntry entry)
+    private static GitModification MapToGitModification(GitHubCommitResponse commit)
     {
-        var segments = entry.OutputFile.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var subject = commit.Commit.Message
+            .Split('\n', StringSplitOptions.TrimEntries)
+            .FirstOrDefault() ?? commit.Commit.Message;
+        var bodyLines = commit.Commit.Message
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Skip(1)
+            .ToArray();
 
-        if (segments.Length < 3)
+        if (subject.StartsWith("Merge pull request", StringComparison.OrdinalIgnoreCase) && bodyLines.Length > 0)
         {
-            throw new InvalidOperationException(
-                $"Unexpected generated output path '{entry.OutputFile}' in history-index.json.");
+            subject = bodyLines[0];
         }
 
-        return new ConfigCatalogEntry
+        return new GitModification
         {
-            OutputFile = entry.OutputFile,
-            SourceFile = entry.SourceFile,
-            ContactType = entry.ContactType,
-            Channel = entry.Channel,
-            Tenant = segments[0],
-            Environment = segments[1],
-            FileName = segments[^1],
-            Modifications = entry.Modifications.ToArray()
+            Commit = commit.Sha,
+            AuthorName = commit.Commit.Author.Name,
+            AuthorEmail = commit.Commit.Author.Email,
+            AuthorDate = commit.Commit.Author.Date,
+            Message = subject
         };
+    }
+
+    private sealed record GitHubTreeResponse
+    {
+        public List<GitHubTreeEntry> Tree { get; init; } = [];
+    }
+
+    private sealed record GitHubTreeEntry
+    {
+        public required string Path { get; init; }
+
+        public required string Type { get; init; }
+    }
+
+    private sealed record GitHubCommitResponse
+    {
+        public required string Sha { get; init; }
+
+        public required GitHubCommitDetail Commit { get; init; }
+    }
+
+    private sealed record GitHubCommitDetail
+    {
+        public required GitHubCommitAuthor Author { get; init; }
+
+        public required string Message { get; init; }
+    }
+
+    private sealed record GitHubCommitAuthor
+    {
+        public required string Name { get; init; }
+
+        public required string Email { get; init; }
+
+        public DateTimeOffset Date { get; init; }
     }
 }

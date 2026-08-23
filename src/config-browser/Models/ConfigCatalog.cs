@@ -4,7 +4,18 @@ internal sealed record ConfigCatalog
 {
     public DateTimeOffset GeneratedAtUtc { get; init; }
 
+    public required GitHubRepository Repository { get; init; }
+
     public IReadOnlyList<ConfigCatalogEntry> Entries { get; init; } = [];
+}
+
+internal sealed record GitHubRepository
+{
+    public required string Owner { get; init; }
+
+    public required string Name { get; init; }
+
+    public required string BaseBranch { get; init; }
 }
 
 internal sealed record ConfigCatalogEntry
@@ -33,6 +44,8 @@ internal sealed record ConfigCatalogEntry
 internal sealed record ConfigHistoryIndex
 {
     public DateTimeOffset GeneratedAtUtc { get; init; }
+
+    public required GitHubRepository Repository { get; init; }
 
     public List<ConfigHistoryEntry> Files { get; init; } = [];
 }
