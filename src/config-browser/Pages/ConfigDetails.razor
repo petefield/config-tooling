@@ -2,7 +2,6 @@
 @using System.Text.Json
 @inject ConfigDataService DataService
 @inject GitHubPromotionService PromotionService
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
 
 <PageTitle>@PageTitleText</PageTitle>
@@ -241,6 +240,35 @@ else
             }
         </section>
     </div>
+
+    @if (showPromoteModal)
+    {
+        <div class="modal-backdrop" @onclick="ClosePromoteModal"></div>
+        <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="promote-modal-title">
+            <section class="modal-card">
+                @if (isPromoting)
+                {
+                    <h2 id="promote-modal-title">Please wait</h2>
+                    <p class="modal-message">Creating the promotion pull request. This can take a few moments.</p>
+                }
+                else
+                {
+                    <h2 id="promote-modal-title">@(promotionErrorMessage is null ? "Confirm promotion" : "Promotion failed")</h2>
+                    <p class="modal-message">Promote <strong>@selectedEntry.FileName</strong> for tenant <strong>@selectedEntry.Tenant</strong> from <strong>@selectedEntry.Environment.ToUpperInvariant()</strong> to <strong>@GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()</strong>?</p>
+
+                    @if (promotionErrorMessage is not null)
+                    {
+                        <p class="modal-error-message">@promotionErrorMessage</p>
+                    }
+
+                    <div class="modal-actions">
+                        <button type="button" class="secondary-button" @onclick="ClosePromoteModal">Cancel</button>
+                        <button type="button" class="promote-button" @onclick="PromoteAsync">@(promotionErrorMessage is null ? "Promote" : "Try again")</button>
+                    </div>
+                }
+            </section>
+        </div>
+    }
 }
 
 @code {
@@ -258,6 +286,7 @@ else
     private bool isLoading = true;
     private bool isPromoting;
     private bool requiresSignIn;
+    private bool showPromoteModal;
     private string? errorMessage;
     private string? promotionErrorMessage;
     private string? promotionMessage;
@@ -291,6 +320,7 @@ else
         promotionErrorMessage = null;
         promotionMessage = null;
         promotionPullRequestUrl = null;
+        showPromoteModal = false;
         selectedEntry = null;
         selectedConfig = null;
 
@@ -399,15 +429,28 @@ else
             }
         }
 
-        var confirmed = await JsRuntime.InvokeAsync<bool>(
-            "confirm",
-            $"Promote '{selectedEntry.FileName}' for tenant '{selectedEntry.Tenant}' from {selectedEntry.Environment.ToUpperInvariant()} to {GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()}?");
+        showPromoteModal = true;
+    }
 
-        if (!confirmed)
+    private void ClosePromoteModal()
+    {
+        if (isPromoting)
         {
             return;
         }
 
+        promotionErrorMessage = null;
+        showPromoteModal = false;
+    }
+
+    private async Task PromoteAsync()
+    {
+        if (selectedEntry is null)
+        {
+            return;
+        }
+
+        promotionErrorMessage = null;
         isPromoting = true;
 
         try
@@ -418,6 +461,7 @@ else
 
             promotionPullRequestUrl = result.PullRequestUrl;
             promotionMessage = $"Created branch '{result.BranchName}' and pull request #{result.PullRequestNumber}.";
+            showPromoteModal = false;
         }
         catch (Exception exception)
         {
