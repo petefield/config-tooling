@@ -9,7 +9,7 @@
 {
     <section class="state-card">
         <h1>Loading config catalog</h1>
-        <p>Reading the generated config index and available files.</p>
+        <p>Reading the live config catalog and available files.</p>
     </section>
 }
 else if (requiresSignIn)
@@ -108,7 +108,7 @@ else
             @if (FilteredEntries.Count == 0)
             {
                 <div class="empty-results">
-                    <p>No generated configs match the current filter selection.</p>
+                    <p>No live configs match the current filter selection.</p>
                 </div>
             }
             else

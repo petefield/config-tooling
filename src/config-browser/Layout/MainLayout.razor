@@ -10,7 +10,7 @@
                     <a class="brand-link" href="">Config Browser</a>
                     <span class="product-tag">Internal</span>
                 </div>
-                <p class="brand-copy">Generated configuration workspace</p>
+                <p class="brand-copy">Secure GitHub-backed configuration workspace</p>
             </div>
         </div>
 
@@ -30,13 +30,26 @@
         <div class="sidebar-section sidebar-note">
             <p class="sidebar-heading">Environment</p>
             <div class="note-card">
-                <strong>Static data browser</strong>
-                <span>Review generated config output, history, and promotion status.</span>
+                <strong>User-scoped access</strong>
+                <span>Review live configuration state, commit history, and promotion activity.</span>
             </div>
         </div>
     </aside>
 
     <div class="app-workspace">
+        <header class="workspace-header">
+            <div class="workspace-header-copy">
+                <span class="workspace-kicker">Operations Console</span>
+                <div class="workspace-title">@(IsDetailsPage ? "Configuration Detail Workspace" : "Configuration Control Center")</div>
+                <p class="workspace-summary">Structured review and controlled promotion for live GitHub-managed configuration.</p>
+            </div>
+
+            <div class="workspace-meta">
+                <span class="workspace-pill">GitHub-backed</span>
+                <span class="workspace-pill">Sign-in required</span>
+            </div>
+        </header>
+
         <main class="app-main">
             @Body
         </main>

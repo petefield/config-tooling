@@ -1,42 +1,48 @@
 .app-shell {
     display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
+    grid-template-columns: 300px minmax(0, 1fr);
     min-height: 100vh;
 }
 
 .app-sidebar {
-    background: linear-gradient(180deg, #132a46 0%, #19385f 100%);
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
-    color: #e8f0fb;
+    background:
+        linear-gradient(180deg, rgba(21, 35, 55, 0.98) 0%, rgba(12, 25, 42, 0.98) 100%),
+        radial-gradient(circle at top, rgba(84, 137, 255, 0.18), transparent 36%);
+    border-right: 1px solid rgba(148, 163, 184, 0.14);
+    color: #e5edf9;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1.5rem 1.25rem;
+    gap: 1.75rem;
+    padding: 1.75rem 1.35rem;
+    position: sticky;
+    top: 0;
+    min-height: 100vh;
 }
 
 .sidebar-brand {
     align-items: center;
     display: flex;
-    gap: 0.9rem;
+    gap: 1rem;
 }
 
 .brand-mark {
     align-items: center;
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.16);
-    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(96, 165, 250, 0.28), rgba(37, 99, 235, 0.16));
+    border: 1px solid rgba(148, 197, 255, 0.24);
+    border-radius: 18px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
     color: #ffffff;
     display: flex;
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 800;
-    height: 3rem;
+    height: 3.25rem;
     justify-content: center;
-    width: 3rem;
+    width: 3.25rem;
 }
 
 .brand-block {
     display: grid;
-    gap: 0.25rem;
+    gap: 0.35rem;
 }
 
 .brand-row {
@@ -48,7 +54,7 @@
 .brand-link {
     color: #ffffff;
     display: inline-block;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     font-weight: 700;
     letter-spacing: -0.01em;
     text-decoration: none;
@@ -59,64 +65,67 @@
 }
 
 .product-tag {
-    background: rgba(255, 255, 255, 0.14);
-    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(96, 165, 250, 0.14);
+    border: 1px solid rgba(148, 197, 255, 0.24);
     border-radius: 999px;
-    color: #ffffff;
-    font-size: 0.72rem;
+    color: #dbeafe;
+    font-size: 0.68rem;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 0.25rem 0.5rem;
+    letter-spacing: 0.08em;
+    padding: 0.26rem 0.56rem;
     text-transform: uppercase;
 }
 
 .brand-copy {
-    color: rgba(232, 240, 251, 0.76);
-    font-size: 0.9rem;
+    color: rgba(226, 232, 240, 0.74);
+    font-size: 0.88rem;
     margin: 0;
+    max-width: 18rem;
 }
 
 .sidebar-section {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.75rem;
 }
 
 .sidebar-heading {
-    color: rgba(232, 240, 251, 0.68);
+    color: rgba(191, 219, 254, 0.64);
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.12em;
     margin: 0;
     text-transform: uppercase;
 }
 
 .nav-item {
-    background: transparent;
-    border: 1px solid transparent;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     border-radius: 14px;
-    color: #f7fbff;
+    color: #f8fbff;
     display: grid;
-    gap: 0.15rem;
-    padding: 0.8rem 0.9rem;
+    gap: 0.2rem;
+    padding: 0.95rem 1rem;
     text-decoration: none;
+    transition: background 0.16s ease, border-color 0.16s ease, transform 0.16s ease;
 }
 
 .nav-item.active,
 .nav-item.active:link,
 .nav-item.active:visited,
 .nav-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.18), rgba(37, 99, 235, 0.14));
+    border-color: rgba(148, 197, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 .nav-item-label {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 650;
 }
 
 .nav-item-hint {
-    color: rgba(232, 240, 251, 0.68);
-    font-size: 0.8rem;
+    color: rgba(226, 232, 240, 0.68);
+    font-size: 0.78rem;
 }
 
 .sidebar-note {
@@ -124,31 +133,92 @@
 }
 
 .note-card {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+    border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: 16px;
     display: grid;
-    gap: 0.35rem;
-    padding: 1rem;
+    gap: 0.45rem;
+    padding: 1rem 1rem 1.05rem;
 }
 
 .note-card strong {
     color: #ffffff;
-    font-size: 0.92rem;
+    font-size: 0.94rem;
 }
 
 .note-card span {
-    color: rgba(232, 240, 251, 0.72);
+    color: rgba(226, 232, 240, 0.72);
     font-size: 0.84rem;
 }
 
 .app-workspace {
+    display: grid;
+    gap: 1.25rem;
     min-width: 0;
-    padding: 1.5rem;
+    padding: 1.75rem 2rem;
 }
 
 .app-main {
-    max-width: 1320px;
+    max-width: 1440px;
+}
+
+.workspace-header {
+    align-items: flex-start;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.88)),
+        linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(15, 23, 42, 0.02));
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 18px;
+    box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    padding: 1.15rem 1.4rem;
+}
+
+.workspace-header-copy {
+    display: grid;
+    gap: 0.35rem;
+}
+
+.workspace-kicker {
+    color: #3b82f6;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.workspace-title {
+    color: #0f172a;
+    font-size: 1.35rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+}
+
+.workspace-summary {
+    color: #5b6b82;
+    margin: 0;
+    max-width: 48rem;
+}
+
+.workspace-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    justify-content: flex-end;
+}
+
+.workspace-pill {
+    background: #f8fbff;
+    border: 1px solid #d7e4f3;
+    border-radius: 999px;
+    color: #284b73;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 0.45rem 0.7rem;
+    text-transform: uppercase;
 }
 
 @media (max-width: 960px) {
@@ -159,6 +229,8 @@
     .app-sidebar {
         gap: 1rem;
         padding: 1rem;
+        min-height: auto;
+        position: static;
     }
 
     .sidebar-note {
@@ -167,5 +239,13 @@
 
     .app-workspace {
         padding: 1rem;
+    }
+
+    .workspace-header {
+        flex-direction: column;
+    }
+
+    .workspace-meta {
+        justify-content: flex-start;
     }
 }
