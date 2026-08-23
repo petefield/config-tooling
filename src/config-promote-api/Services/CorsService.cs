@@ -8,7 +8,11 @@ internal sealed class CorsService
 
     public CorsService(GitHubAppOptions options)
     {
-        _allowedOrigins = options.AllowedOrigins;
+        _allowedOrigins = options.AllowedOrigins
+            .Select(NormalizeOrigin)
+            .OfType<string>()
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
     }
 
     public void Apply(HttpRequestData request, HttpResponseData response)
@@ -33,7 +37,7 @@ internal sealed class CorsService
             return _allowedOrigins.Count == 0 ? "*" : null;
         }
 
-        var origin = values.FirstOrDefault();
+        var origin = NormalizeOrigin(values.FirstOrDefault());
 
         if (string.IsNullOrWhiteSpace(origin))
         {
@@ -46,5 +50,15 @@ internal sealed class CorsService
         }
 
         return null;
+    }
+
+    private static string? NormalizeOrigin(string? origin)
+    {
+        if (string.IsNullOrWhiteSpace(origin))
+        {
+            return null;
+        }
+
+        return origin.Trim().TrimEnd('/');
     }
 }

@@ -40,7 +40,7 @@ The details page can also promote a config to the next environment. The publishe
    - `GitHubAppClientSecret`
    - `GitHubAppCallbackUrl`
    - `GitHubAppSessionKey` as a base64-encoded 32-byte secret used to protect the browser session payload
-   - `GitHubAppAllowedOrigins` as a comma-separated list of allowed browser origins such as your local dev URL and GitHub Pages URL
+   - `GitHubAppAllowedOrigins` as a comma-separated list of allowed browser origins such as your local dev URL and GitHub Pages URL, for example `http://localhost:5172,https://petefield.github.io`
 4. Update `src/config-browser/wwwroot/appsettings.json` so `PromoteApiBaseUrl` points at the deployed Azure Functions base URL.
 
 For local backend development, copy `src/config-promote-api/local.settings.sample.json` to `local.settings.json` and fill in the real GitHub App values.
