@@ -18,7 +18,7 @@
             <p class="sidebar-heading">Workspace</p>
             <NavLink href="" Match="NavLinkMatch.All" class="nav-item">
                 <span class="nav-item-label">Config catalog</span>
-                <span class="nav-item-hint">Browse outputs</span>
+                <span class="nav-item-hint">Browse configurations</span>
             </NavLink>
 
             <div class="nav-item @(IsDetailsPage ? "active" : string.Empty)">
@@ -39,7 +39,6 @@
     <div class="app-workspace">
         <header class="workspace-header">
             <div class="workspace-header-copy">
-                <span class="workspace-kicker">Operations Console</span>
                 <div class="workspace-title">@(IsDetailsPage ? "Configuration Detail Workspace" : "Configuration Control Center")</div>
                 <p class="workspace-summary">Structured review and controlled promotion for live GitHub-managed configuration.</p>
             </div>
