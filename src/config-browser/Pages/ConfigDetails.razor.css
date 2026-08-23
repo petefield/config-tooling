@@ -270,6 +270,13 @@
     margin: 0;
 }
 
+.modal-loading-gif {
+    display: block;
+    height: 4rem;
+    margin: 0 auto 1rem;
+    width: 4rem;
+}
+
 .modal-error-message {
     color: #b42318;
     margin: 1rem 0 0;
