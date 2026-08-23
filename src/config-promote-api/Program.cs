@@ -9,6 +9,7 @@ var host = new HostBuilder()
         services.AddHttpClient();
         services.AddSingleton(GitHubAppOptions.FromEnvironment());
         services.AddSingleton<CorsService>();
+        services.AddSingleton<GitHubRepositoryReadService>();
         services.AddSingleton<TokenProtector>();
         services.AddSingleton<GitHubUserTokenService>();
         services.AddSingleton<GitHubRepositoryPromotionService>();

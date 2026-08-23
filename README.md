@@ -24,7 +24,7 @@ A standalone Blazor WebAssembly browser app lives in `src/config-browser`.
 
 1. Start the browser app from `src/config-browser` with `dotnet run`.
 
-The browser app reads the config list, config bodies, and per-file history directly from GitHub, so merged config changes show up in the UI without waiting for generated browser data to be refreshed. The GitHub Pages workflow now only republishes the browser app itself when its files change.
+The browser app reads the config list, config bodies, and per-file history through the Azure Functions promote API, which in turn reads the live repository state from GitHub. That keeps merged config changes visible in the UI without waiting for generated browser data to be refreshed. The GitHub Pages workflow now only republishes the browser app itself when its files change.
 
 The details page can also promote a config to the next environment. The published browser app signs the user in with a GitHub App via the Azure Functions backend in `src/config-promote-api`, then that backend creates a branch, copies the config into the target `configs/<tenant>/<environment>/...` path, and opens a pull request as the signed-in user.
 
