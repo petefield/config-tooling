@@ -30,7 +30,7 @@
     ],
     "mapping": [
         {
-            "inputField": "#ActivationNotificationEmail_Template",
+            "inputField": "#test_Template",
             "outputField": "templateId"
         },
         {
