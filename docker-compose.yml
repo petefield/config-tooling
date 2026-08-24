@@ -1,0 +1,30 @@
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite-data:/data
+
+  promote-api:
+    build:
+      context: .
+      dockerfile: src/config-promote-api/Dockerfile
+    depends_on:
+      - azurite
+    ports:
+      - "7071:80"
+    environment:
+      AzureWebJobsStorage: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;QueueEndpoint=http://azurite:10001/devstoreaccount1;TableEndpoint=http://azurite:10002/devstoreaccount1;
+      FUNCTIONS_WORKER_RUNTIME: dotnet-isolated
+      GitHubAppClientId: ${GITHUB_APP_CLIENT_ID:-Iv23libI6BYKeKao3fKT}
+      GitHubAppClientSecret: ${GITHUB_APP_CLIENT_SECRET:-b4d5221c37d6bd0385339900157361d8792e25b5}
+      GitHubAppCallbackUrl: ${GITHUB_APP_CALLBACK_URL:-http://localhost:7071/api/auth/github/callback}
+      GitHubAppSessionKey: ${GITHUB_APP_SESSION_KEY:-TEB+ftiMxfVscYKX25as70UuUWD9A+dZzU32LFIzGa8=}
+      GitHubAppAllowedOrigins: ${GITHUB_APP_ALLOWED_ORIGINS:-http://localhost:5172,https://petefield.github.io}
+
+volumes:
+  azurite-data:

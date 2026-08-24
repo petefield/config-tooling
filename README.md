@@ -112,11 +112,19 @@ From `src/config-promote-api`:
 func start
 ```
 
-If you need local storage with Azurite in Docker:
+To run the Function App and Azurite together in Docker Compose:
 
 ```bash
-docker run --rm -p 10000:10000 -p 10001:10001 -p 10002:10002 mcr.microsoft.com/azure-storage/azurite
+cp docker-compose.env.sample .env
+docker compose up --build
 ```
+
+That starts:
+
+- the promote API on `http://localhost:7071`
+- Azurite blob/queue/table endpoints on `10000`, `10001`, and `10002`
+
+The compose file maps the GitHub App settings from `.env` into the environment variables expected by `src/config-promote-api`.
 
 ## GitHub App setup
 

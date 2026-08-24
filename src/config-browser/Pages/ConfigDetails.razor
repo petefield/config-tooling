@@ -40,421 +40,393 @@ else if (selectedEntry is null || selectedConfig is null)
 else
 {
     <div class="details-shell">
-        <section class="details-grid">
-            <div class="detail-toolbar detail-card detail-card-wide">
-                <div class="toolbar-primary">
-                    <div class="toolbar-heading-row">
-                        <h1>@selectedEntry.FileName</h1>
-                        <div class="toolbar-badges">
-                            <span class="toolbar-badge toolbar-badge-tenant">
-                                <span class="toolbar-icon" aria-hidden="true">
-                                    <svg viewBox="0 0 16 16" focusable="false">
-                                        <path d="M3 13.25a.75.75 0 0 0 1.5 0v-.75h7v.75a.75.75 0 0 0 1.5 0V6.62l.72.36a.75.75 0 0 0 .67-1.34l-6-3a.75.75 0 0 0-.67 0l-6 3a.75.75 0 1 0 .67 1.34L3 6.62v6.63Zm1.5-1.25V7.37l3.5-1.75 3.5 1.75V12h-7Zm1.5-2.75a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5A.75.75 0 0 1 6 9.25Z" />
-                                    </svg>
-                                </span>
-                                <span>@selectedEntry.Tenant.ToUpperInvariant()</span>
-                            </span>
-                            <span class="@GetEnvironmentBadgeClass(selectedEntry.Environment)">
-                                <span class="toolbar-icon" aria-hidden="true">
-                                    @((MarkupString)GetEnvironmentBadgeIcon(selectedEntry.Environment))
-                                </span>
-                                <span>@selectedEntry.Environment.ToUpperInvariant()</span>
-                            </span>
-                            @if (CanPromote)
-                            {
-                                <span class="@GetEnvironmentBadgeClass(GetPromotionTargetEnvironment(selectedEntry))">
-                                    <span class="toolbar-icon" aria-hidden="true">
-                                        @((MarkupString)GetEnvironmentBadgeIcon(GetPromotionTargetEnvironment(selectedEntry)))
-                                    </span>
-                                    <span>@GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()</span>
-                                </span>
-                            }
-                        </div>
-                    </div>
 
-                    <div class="toolbar-meta">
-                        <span class="toolbar-meta-item">
-                            <span class="toolbar-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M2.75 2h6.19c.464 0 .91.184 1.238.513l2.81 2.81c.329.328.513.774.513 1.238v6.689c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 13.25V3.75C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6.75H9.75A1.75 1.75 0 0 1 8 5V3.5H2.75ZM9.5 3.81V5a.25.25 0 0 0 .25.25h1.19L9.5 3.81Z" />
-                                </svg>
-                            </span>
-                            <span>@selectedEntry.SourceFile</span>
-                        </span>
-                        <span class="toolbar-meta-item">
-                            <span class="toolbar-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M2.75 2A1.75 1.75 0 0 0 1 3.75v8.5C1 13.216 1.784 14 2.75 14h10.5A1.75 1.75 0 0 0 15 12.25v-8.5A1.75 1.75 0 0 0 13.25 2H2.75Zm0 1.5h10.5a.25.25 0 0 1 .25.25V5h-11V3.75a.25.25 0 0 1 .25-.25ZM2.5 6.5h11v5.75a.25.25 0 0 1-.25.25H2.75a.25.25 0 0 1-.25-.25V6.5Zm2 1.25a.75.75 0 0 0 0 1.5h2.25a.75.75 0 0 0 0-1.5H4.5Z" />
-                                </svg>
-                            </span>
-                            <span>@selectedEntry.OutputFile</span>
-                        </span>
-                    </div>
-                </div>
+        <h1><span class="header-icon" aria-hidden="true">
+            <svg viewBox="0 0 16 16" focusable="false">
+                <path
+                d="M2.75 2A1.75 1.75 0 0 0 1 3.75v8.5C1 13.216 1.784 14 2.75 14h10.5A1.75 1.75 0 0 0 15 12.25v-8.5A1.75 1.75 0 0 0 13.25 2H2.75Zm0 1.5h10.5a.25.25 0 0 1 .25.25V5h-11V3.75a.25.25 0 0 1 .25-.25ZM2.5 6.5h11v5.75a.25.25 0 0 1-.25.25H2.75a.25.25 0 0 1-.25-.25V6.5Zm2 1.25a.75.75 0 0 0 0 1.5h2.25a.75.75 0 0 0 0-1.5H4.5Z" />
+            </svg>
+        </span> @selectedEntry.FileName
+        <div class="header-badges">
 
-                <div class="toolbar-group toolbar-group-end">
-                    <div class="toolbar-group">
-                        <a class="toolbar-button toolbar-button-secondary" href="" title="Back to catalog" aria-label="Back to catalog">
+            <span class="toolbar-badge toolbar-badge-tenant">
+                <span class="toolbar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" focusable="false">
+                        <path
+                        d="M3 13.25a.75.75 0 0 0 1.5 0v-.75h7v.75a.75.75 0 0 0 1.5 0V6.62l.72.36a.75.75 0 0 0 .67-1.34l-6-3a.75.75 0 0 0-.67 0l-6 3a.75.75 0 1 0 .67 1.34L3 6.62v6.63Zm1.5-1.25V7.37l3.5-1.75 3.5 1.75V12h-7Zm1.5-2.75a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5A.75.75 0 0 1 6 9.25Z" />
+                    </svg>
+                </span>
+                <span>@selectedEntry.Tenant.ToUpperInvariant()</span>
+            </span>
+            <span class="@GetEnvironmentBadgeClass(selectedEntry.Environment)">
+                <span class="toolbar-icon" aria-hidden="true">
+                    @((MarkupString)GetEnvironmentBadgeIcon(selectedEntry.Environment))
+                </span>
+                <span>@selectedEntry.Environment.ToUpperInvariant()</span>
+            </span>
+        </div>
+    </h1>
+
+    <section class="details-grid">
+        <div class="detail-toolbar detail-card detail-card-wide">
+   
+
+
+            <div class="toolbar-group">
+                <div class="toolbar-group">
+                    <a class="toolbar-button toolbar-button-secondary" href="" title="Back to catalog"
+                       aria-label="Back to catalog">
+                        <span class="toolbar-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path
+                                d="M6.78 3.22a.75.75 0 0 1 0 1.06L3.81 7.25H13a.75.75 0 0 1 0 1.5H3.81l2.97 2.97a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" />
+                            </svg>
+                        </span>
+                    </a>
+
+                    @if (selectedRepository is not null)
+                    {
+                        <a class="toolbar-button toolbar-button-secondary" href="@BuildSourceFileUrl()" target="_blank"
+                           rel="noreferrer" title="Open source in GitHub" aria-label="Open source in GitHub">
                             <span class="toolbar-icon" aria-hidden="true">
                                 <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M6.78 3.22a.75.75 0 0 1 0 1.06L3.81 7.25H13a.75.75 0 0 1 0 1.5H3.81l2.97 2.97a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" />
+                                    <path
+                                    d="M3.75 2A1.75 1.75 0 0 0 2 3.75v8.5C2 13.216 2.784 14 3.75 14h8.5A1.75 1.75 0 0 0 14 12.25v-3a.75.75 0 0 0-1.5 0v3a.25.25 0 0 1-.25.25h-8.5a.25.25 0 0 1-.25-.25v-8.5c0-.138.112-.25.25-.25h3a.75.75 0 0 0 0-1.5h-3Z" />
+                                    <path
+                                    d="M9 2.75A.75.75 0 0 1 9.75 2h3.5c.414 0 .75.336.75.75v3.5a.75.75 0 0 1-1.5 0V4.56L8.53 8.53a.75.75 0 0 1-1.06-1.06L11.44 3.5H9.75A.75.75 0 0 1 9 2.75Z" />
                                 </svg>
                             </span>
                         </a>
-
-                        @if (selectedRepository is not null)
-                        {
-                            <a class="toolbar-button toolbar-button-secondary" href="@BuildSourceFileUrl()" target="_blank" rel="noreferrer" title="Open source in GitHub" aria-label="Open source in GitHub">
-                                <span class="toolbar-icon" aria-hidden="true">
-                                    <svg viewBox="0 0 16 16" focusable="false">
-                                        <path d="M3.75 2A1.75 1.75 0 0 0 2 3.75v8.5C2 13.216 2.784 14 3.75 14h8.5A1.75 1.75 0 0 0 14 12.25v-3a.75.75 0 0 0-1.5 0v3a.25.25 0 0 1-.25.25h-8.5a.25.25 0 0 1-.25-.25v-8.5c0-.138.112-.25.25-.25h3a.75.75 0 0 0 0-1.5h-3Z" />
-                                        <path d="M9 2.75A.75.75 0 0 1 9.75 2h3.5c.414 0 .75.336.75.75v3.5a.75.75 0 0 1-1.5 0V4.56L8.53 8.53a.75.75 0 0 1-1.06-1.06L11.44 3.5H9.75A.75.75 0 0 1 9 2.75Z" />
-                                    </svg>
-                                </span>
-                            </a>
-                        }
-                    </div>
-
-                    <div class="toolbar-status @(CanPromote ? "ready" : "current")">
-                        <span class="toolbar-icon" aria-hidden="true">
-                            <svg viewBox="0 0 16 16" focusable="false">
-                                @if (CanPromote)
-                                {
-                                    <path d="M8.22 2.22a.75.75 0 0 0-1.06 0L2.91 6.47a.75.75 0 1 0 1.06 1.06L7 4.5V13a.75.75 0 0 0 1.5 0V4.5l3.03 3.03a.75.75 0 0 0 1.06-1.06L8.22 2.22Z" />
-                                }
-                                else
-                                {
-                                    <path d="M13.78 8.53a.75.75 0 0 0 0-1.06L9.53 3.22a.75.75 0 0 0-1.06 1.06L11.44 7.25H3a.75.75 0 0 0 0 1.5h8.44l-2.97 2.97a.75.75 0 1 0 1.06 1.06l4.25-4.25Z" />
-                                }
-                            </svg>
-                        </span>
-                        <div class="toolbar-status-copy">
-                            <strong>@GetToolbarStatusTitle(selectedEntry)</strong>
-                            <span>@GetToolbarStatusText(selectedEntry)</span>
-                        </div>
-                    </div>
-
-                    <button type="button" class="toolbar-button toolbar-button-primary" @onclick="ConfirmPromoteAsync" disabled="@(!CanPromote || isPromoting)">
-                        <span class="toolbar-icon" aria-hidden="true">
-                            <svg viewBox="0 0 16 16" focusable="false">
-                                <path d="M8.22 2.22a.75.75 0 0 0-1.06 0L2.91 6.47a.75.75 0 1 0 1.06 1.06L7 4.5V13a.75.75 0 0 0 1.5 0V4.5l3.03 3.03a.75.75 0 0 0 1.06-1.06L8.22 2.22Z" />
-                            </svg>
-                        </span>
-                        <span>@GetPromoteButtonLabel(selectedEntry, isPromoting)</span>
-                    </button>
+                    }
                 </div>
-            </div>
 
-            @if (promotionErrorMessage is not null)
-            {
-                <div class="toolbar-feedback detail-card detail-card-wide toolbar-feedback-error">
+            
+
+                <button type="button" class="toolbar-button toolbar-button-primary" @onclick="ConfirmPromoteAsync"
+                        disabled="@(!CanPromote || isPromoting)">
                     <span class="toolbar-icon" aria-hidden="true">
                         <svg viewBox="0 0 16 16" focusable="false">
-                            <path d="M6.457 1.047c.659-1.182 2.427-1.182 3.086 0l5.47 9.819c.64 1.15-.19 2.584-1.543 2.584H2.53C1.177 13.45.347 12.016.987 10.866l5.47-9.819ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                            <path
+                            d="M8.22 2.22a.75.75 0 0 0-1.06 0L2.91 6.47a.75.75 0 1 0 1.06 1.06L7 4.5V13a.75.75 0 0 0 1.5 0V4.5l3.03 3.03a.75.75 0 0 0 1.06-1.06L8.22 2.22Z" />
                         </svg>
                     </span>
-                    <p>@promotionErrorMessage</p>
-                </div>
-            }
-            else if (promotionMessage is not null)
-            {
-                <div class="toolbar-feedback detail-card detail-card-wide">
-                    <span class="toolbar-icon" aria-hidden="true">
-                        <svg viewBox="0 0 16 16" focusable="false">
-                            <path d="M13.78 3.97a.75.75 0 1 0-1.06-1.06L6.5 9.128 3.28 5.91a.75.75 0 1 0-1.06 1.06l3.75 3.75a.75.75 0 0 0 1.06 0l6.75-6.75Z" />
-                        </svg>
-                    </span>
-                    <p>
-                        @promotionMessage
-                        @if (promotionPullRequestUrl is not null)
-                        {
-                            <a href="@promotionPullRequestUrl" target="_blank" rel="noreferrer">Open PR</a>
-                        }
-                    </p>
-                </div>
-            }
 
-            <div class="detail-card detail-card-wide tabbed-details-card">
-                <div class="details-tabs" role="tablist" aria-label="Config detail sections">
-                    <button type="button"
-                            class="@GetTabButtonClass(DetailTab.Overview)"
-                            role="tab"
-                            aria-selected="@IsSelectedTab(DetailTab.Overview)"
-                            @onclick="@(() => SelectTab(DetailTab.Overview))">
-                        <span class="details-tab-content">
-                            <span class="details-tab-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M2.75 3A1.75 1.75 0 0 0 1 4.75v6.5C1 12.216 1.784 13 2.75 13h10.5A1.75 1.75 0 0 0 15 11.25v-6.5A1.75 1.75 0 0 0 13.25 3H2.75Zm0 1.5h10.5a.25.25 0 0 1 .25.25v1.19H2.5V4.75a.25.25 0 0 1 .25-.25Zm-.25 2.94h11v3.81a.25.25 0 0 1-.25.25H2.75a.25.25 0 0 1-.25-.25V7.44Z" />
-                                </svg>
-                            </span>
-                            <span>Overview</span>
-                        </span>
-                    </button>
-                    <button type="button"
-                            class="@GetTabButtonClass(DetailTab.InputData)"
-                            role="tab"
-                            aria-selected="@IsSelectedTab(DetailTab.InputData)"
-                            @onclick="@(() => SelectTab(DetailTab.InputData))">
-                        <span class="details-tab-content">
-                            <span class="details-tab-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M2.75 2h10.5C14.216 2 15 2.784 15 3.75v8.5c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 12.25v-8.5C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25H2.75Zm1.5 1.75a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3A.75.75 0 0 1 5 10.5h3a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z" />
-                                </svg>
-                            </span>
-                            <span>Input data</span>
-                        </span>
-                        <span class="details-tab-count">@selectedConfig.InputData.Count</span>
-                    </button>
-                    <button type="button"
-                            class="@GetTabButtonClass(DetailTab.Mappings)"
-                            role="tab"
-                            aria-selected="@IsSelectedTab(DetailTab.Mappings)"
-                            @onclick="@(() => SelectTab(DetailTab.Mappings))">
-                        <span class="details-tab-content">
-                            <span class="details-tab-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M3 3.75A1.75 1.75 0 0 1 4.75 2h2.5A1.75 1.75 0 0 1 9 3.75v.5h2.25A1.75 1.75 0 0 1 13 6v1.25h.25a1.75 1.75 0 1 1 0 1.5H13V10a1.75 1.75 0 0 1-1.75 1.75H9v.5A1.75 1.75 0 0 1 7.25 14h-2.5A1.75 1.75 0 0 1 3 12.25v-.5H1.75a.75.75 0 0 1 0-1.5H3V8.75h-.25a1.75 1.75 0 1 1 0-1.5H3V6c0-.966.784-1.75 1.75-1.75H6V3.75c0-.138-.112-.25-.25-.25h-1A.25.25 0 0 0 4.5 3.75v8.5c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25v-.5H4.75A1.75 1.75 0 0 1 3 10V3.75Zm6 2v4.5h2.25a.25.25 0 0 0 .25-.25V6a.25.25 0 0 0-.25-.25H9Z" />
-                                </svg>
-                            </span>
-                            <span>Mappings</span>
-                        </span>
-                        <span class="details-tab-count">@selectedConfig.Mapping.Count</span>
-                    </button>
-                    <button type="button"
-                            class="@GetTabButtonClass(DetailTab.History)"
-                            role="tab"
-                            aria-selected="@IsSelectedTab(DetailTab.History)"
-                            @onclick="@(() => SelectTab(DetailTab.History))">
-                        <span class="details-tab-content">
-                            <span class="details-tab-icon" aria-hidden="true">
-                                <svg viewBox="0 0 16 16" focusable="false">
-                                    <path d="M8 1.5a6.5 6.5 0 1 0 4.596 11.096.75.75 0 1 0-1.06-1.06A5 5 0 1 1 13 8a.75.75 0 0 0 1.5 0A6.5 6.5 0 0 0 8 1.5Zm.75 3.25a.75.75 0 0 0-1.5 0V8c0 .199.079.39.22.53l2 2a.75.75 0 0 0 1.06-1.06L8.75 7.69V4.75Z" />
-                                </svg>
-                            </span>
-                            <span>Git history</span>
-                        </span>
-                        <span class="details-tab-count">@selectedEntry.Modifications.Count</span>
-                    </button>
-                    @if (selectedConfig.AdditionalProperties.Count > 0)
-                    {
-                        <button type="button"
-                                class="@GetTabButtonClass(DetailTab.Additional)"
-                                role="tab"
-                                aria-selected="@IsSelectedTab(DetailTab.Additional)"
-                                @onclick="@(() => SelectTab(DetailTab.Additional))">
-                            <span class="details-tab-content">
-                                <span class="details-tab-icon" aria-hidden="true">
-                                    <svg viewBox="0 0 16 16" focusable="false">
-                                        <path d="M2.75 2h6.19c.464 0 .91.184 1.238.513l2.81 2.81c.329.328.513.774.513 1.238v6.689c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 13.25V3.75C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6.75H9.75A1.75 1.75 0 0 1 8 5V3.5H2.75ZM9.5 3.81V5a.25.25 0 0 0 .25.25h1.19L9.5 3.81Z" />
-                                    </svg>
-                                </span>
-                                <span>Additional</span>
-                            </span>
-                            <span class="details-tab-count">@selectedConfig.AdditionalProperties.Count</span>
-                        </button>
-                    }
-                </div>
-
-                <div class="tab-panel" role="tabpanel">
-                    @if (selectedTab == DetailTab.Overview)
-                    {
-                        <div class="section-heading">
-                            <h2>Overview</h2>
-                        </div>
-                        <dl class="overview-grid">
-                            <div>
-                                <dt>Operation unit</dt>
-                                <dd>@DisplayValue(selectedConfig.OperationUnit)</dd>
-                            </div>
-                            <div>
-                                <dt>Channel</dt>
-                                <dd>@DisplayValue(selectedConfig.Channel)</dd>
-                            </div>
-                            <div>
-                                <dt>Trigger</dt>
-                                <dd>@DisplayValue(selectedConfig.Trigger)</dd>
-                            </div>
-                            <div>
-                                <dt>Connector</dt>
-                                <dd>@DisplayValue(selectedConfig.Connector)</dd>
-                            </div>
-                            <div>
-                                <dt>Output type</dt>
-                                <dd>@DisplayValue(selectedConfig.OutputType)</dd>
-                            </div>
-                            <div>
-                                <dt>@GetMatchFieldLabel(selectedEntry)</dt>
-                                <dd>@GetMatchFieldValue(selectedEntry)</dd>
-                            </div>
-                        </dl>
-
-                        @if (selectedConfig.Condition is not null)
-                        {
-                            <section class="tab-section">
-                                <h2>Condition</h2>
-                                <p class="condition-description">@DisplayValue(selectedConfig.Condition.Description)</p>
-                                <pre>@selectedConfig.Condition.Expression</pre>
-                            </section>
-                        }
-                    }
-                    else if (selectedTab == DetailTab.InputData)
-                    {
-                        <div class="section-heading">
-                            <h2>Input data</h2>
-                            <span>@selectedConfig.InputData.Count field(s)</span>
-                        </div>
-
-                        @if (selectedConfig.InputData.Count == 0)
-                        {
-                            <p class="section-empty">No input fields are defined for this config.</p>
-                        }
-                        else
-                        {
-                            <div class="table-wrap">
-                                <table class="detail-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Type</th>
-                                            <th>Path</th>
-                                            <th>Required</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var input in selectedConfig.InputData)
-                                        {
-                                            <tr>
-                                                <td>@DisplayValue(input.Name)</td>
-                                                <td>@DisplayValue(input.Type)</td>
-                                                <td><code>@DisplayValue(input.Path)</code></td>
-                                                <td>@(input.Required == true ? "Yes" : "No")</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    }
-                    else if (selectedTab == DetailTab.Mappings)
-                    {
-                        <div class="section-heading">
-                            <h2>Mappings</h2>
-                            <span>@selectedConfig.Mapping.Count mapping(s)</span>
-                        </div>
-
-                        @if (selectedConfig.Mapping.Count == 0)
-                        {
-                            <p class="section-empty">No mappings are defined for this config.</p>
-                        }
-                        else
-                        {
-                            <div class="table-wrap">
-                                <table class="detail-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Input field</th>
-                                            <th>Output field</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var mapping in selectedConfig.Mapping)
-                                        {
-                                            <tr>
-                                                <td><code>@DisplayValue(mapping.InputField)</code></td>
-                                                <td>@DisplayValue(mapping.OutputField)</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    }
-                    else if (selectedTab == DetailTab.History)
-                    {
-                        <div class="section-heading">
-                            <h2>Git history</h2>
-                            <span>@selectedEntry.Modifications.Count commit(s)</span>
-                        </div>
-
-                        @if (selectedEntry.Modifications.Count == 0)
-                        {
-                            <p class="section-empty">No git history is available for this source file.</p>
-                        }
-                        else
-                        {
-                            <div class="table-wrap">
-                                <table class="detail-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Message</th>
-                                            <th>Author</th>
-                                            <th>Date</th>
-                                            <th>Commit</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var modification in selectedEntry.Modifications)
-                                        {
-                                            <tr>
-                                                <td class="history-message-cell">@modification.Message</td>
-                                                <td>@modification.AuthorName</td>
-                                                <td>@modification.AuthorDate.ToLocalTime():g</td>
-                                                <td>
-                                                    <a class="history-commit-link" href="@BuildCommitUrl(modification.Commit)" target="_blank" rel="noreferrer">
-                                                        <code>@modification.Commit[..8]</code>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                    }
-                    else if (selectedTab == DetailTab.Additional)
-                    {
-                        <div class="section-heading">
-                            <h2>Additional sections</h2>
-                            <span>@selectedConfig.AdditionalProperties.Count section(s)</span>
-                        </div>
-
-                        @foreach (var property in selectedConfig.AdditionalProperties.OrderBy(static property => property.Key, StringComparer.OrdinalIgnoreCase))
-                        {
-                            <details class="json-section">
-                                <summary>@property.Key</summary>
-                                <pre>@FormatJson(property.Value)</pre>
-                            </details>
-                        }
-                    }
-                </div>
+                </button>
             </div>
-        </section>
-    </div>
+        </div>
 
-    @if (showPromoteModal)
-    {
-        <div class="modal-backdrop" @onclick="ClosePromoteModal"></div>
-        <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="promote-modal-title">
-            <section class="modal-card">
-                @if (isPromoting)
+        @if (promotionErrorMessage is not null)
+        {
+            <div class="toolbar-feedback detail-card detail-card-wide toolbar-feedback-error">
+                <span class="toolbar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" focusable="false">
+                        <path
+                        d="M6.457 1.047c.659-1.182 2.427-1.182 3.086 0l5.47 9.819c.64 1.15-.19 2.584-1.543 2.584H2.53C1.177 13.45.347 12.016.987 10.866l5.47-9.819ZM8 5a.75.75 0 0 0-.75.75v2.5a.75.75 0 0 0 1.5 0v-2.5A.75.75 0 0 0 8 5Zm0 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                    </svg>
+                </span>
+                <p>@promotionErrorMessage</p>
+            </div>
+        }
+        else if (promotionMessage is not null)
+        {
+            <div class="toolbar-feedback detail-card detail-card-wide">
+                <span class="toolbar-icon" aria-hidden="true">
+                    <svg viewBox="0 0 16 16" focusable="false">
+                        <path
+                        d="M13.78 3.97a.75.75 0 1 0-1.06-1.06L6.5 9.128 3.28 5.91a.75.75 0 1 0-1.06 1.06l3.75 3.75a.75.75 0 0 0 1.06 0l6.75-6.75Z" />
+                    </svg>
+                </span>
+                <p>
+                    @promotionMessage
+                    @if (promotionPullRequestUrl is not null)
+                    {
+                        <a href="@promotionPullRequestUrl" target="_blank" rel="noreferrer">Open PR</a>
+                    }
+                </p>
+            </div>
+        }
+
+        <div class="detail-card detail-card-wide tabbed-details-card">
+            <div class="details-tabs" role="tablist" aria-label="Config detail sections">
+                <button type="button" class="@GetTabButtonClass(DetailTab.Overview)" role="tab"
+                        aria-selected="@IsSelectedTab(DetailTab.Overview)"
+                        @onclick="@(() => SelectTab(DetailTab.Overview))">
+                    <span class="details-tab-content">
+                        <span class="details-tab-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path
+                                d="M2.75 3A1.75 1.75 0 0 0 1 4.75v6.5C1 12.216 1.784 13 2.75 13h10.5A1.75 1.75 0 0 0 15 11.25v-6.5A1.75 1.75 0 0 0 13.25 3H2.75Zm0 1.5h10.5a.25.25 0 0 1 .25.25v1.19H2.5V4.75a.25.25 0 0 1 .25-.25Zm-.25 2.94h11v3.81a.25.25 0 0 1-.25.25H2.75a.25.25 0 0 1-.25-.25V7.44Z" />
+                            </svg>
+                        </span>
+                        <span>Overview</span>
+                    </span>
+                </button>
+                <button type="button" class="@GetTabButtonClass(DetailTab.InputData)" role="tab"
+                        aria-selected="@IsSelectedTab(DetailTab.InputData)"
+                        @onclick="@(() => SelectTab(DetailTab.InputData))">
+                    <span class="details-tab-content">
+                        <span class="details-tab-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path
+                                d="M2.75 2h10.5C14.216 2 15 2.784 15 3.75v8.5c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 12.25v-8.5C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h10.5a.25.25 0 0 0 .25-.25v-8.5a.25.25 0 0 0-.25-.25H2.75Zm1.5 1.75a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3a.75.75 0 0 1 .75-.75h5.5a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Zm0 3A.75.75 0 0 1 5 10.5h3a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z" />
+                            </svg>
+                        </span>
+                        <span>Input data</span>
+                    </span>
+                    <span class="details-tab-count">@selectedConfig.InputData.Count</span>
+                </button>
+                <button type="button" class="@GetTabButtonClass(DetailTab.Mappings)" role="tab"
+                        aria-selected="@IsSelectedTab(DetailTab.Mappings)"
+                        @onclick="@(() => SelectTab(DetailTab.Mappings))">
+                    <span class="details-tab-content">
+                        <span class="details-tab-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path
+                                d="M3 3.75A1.75 1.75 0 0 1 4.75 2h2.5A1.75 1.75 0 0 1 9 3.75v.5h2.25A1.75 1.75 0 0 1 13 6v1.25h.25a1.75 1.75 0 1 1 0 1.5H13V10a1.75 1.75 0 0 1-1.75 1.75H9v.5A1.75 1.75 0 0 1 7.25 14h-2.5A1.75 1.75 0 0 1 3 12.25v-.5H1.75a.75.75 0 0 1 0-1.5H3V8.75h-.25a1.75 1.75 0 1 1 0-1.5H3V6c0-.966.784-1.75 1.75-1.75H6V3.75c0-.138-.112-.25-.25-.25h-1A.25.25 0 0 0 4.5 3.75v8.5c0 .138.112.25.25.25h1a.25.25 0 0 0 .25-.25v-.5H4.75A1.75 1.75 0 0 1 3 10V3.75Zm6 2v4.5h2.25a.25.25 0 0 0 .25-.25V6a.25.25 0 0 0-.25-.25H9Z" />
+                            </svg>
+                        </span>
+                        <span>Mappings</span>
+                    </span>
+                    <span class="details-tab-count">@selectedConfig.Mapping.Count</span>
+                </button>
+                <button type="button" class="@GetTabButtonClass(DetailTab.History)" role="tab"
+                        aria-selected="@IsSelectedTab(DetailTab.History)" @onclick="@(() => SelectTab(DetailTab.History))">
+                    <span class="details-tab-content">
+                        <span class="details-tab-icon" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" focusable="false">
+                                <path
+                                d="M8 1.5a6.5 6.5 0 1 0 4.596 11.096.75.75 0 1 0-1.06-1.06A5 5 0 1 1 13 8a.75.75 0 0 0 1.5 0A6.5 6.5 0 0 0 8 1.5Zm.75 3.25a.75.75 0 0 0-1.5 0V8c0 .199.079.39.22.53l2 2a.75.75 0 0 0 1.06-1.06L8.75 7.69V4.75Z" />
+                            </svg>
+                        </span>
+                        <span>Git history</span>
+                    </span>
+                    <span class="details-tab-count">@selectedEntry.Modifications.Count</span>
+                </button>
+                @if (selectedConfig.AdditionalProperties.Count > 0)
                 {
-                    <h2 id="promote-modal-title">Please wait</h2>
-                    <img class="modal-loading-gif" src="images/loading.gif" alt="Loading" />
-                    <p class="modal-message">Creating the promotion pull request. This can take a few moments.</p>
+                    <button type="button" class="@GetTabButtonClass(DetailTab.Additional)" role="tab"
+                            aria-selected="@IsSelectedTab(DetailTab.Additional)"
+                            @onclick="@(() => SelectTab(DetailTab.Additional))">
+                        <span class="details-tab-content">
+                            <span class="details-tab-icon" aria-hidden="true">
+                                <svg viewBox="0 0 16 16" focusable="false">
+                                    <path
+                                    d="M2.75 2h6.19c.464 0 .91.184 1.238.513l2.81 2.81c.329.328.513.774.513 1.238v6.689c0 .966-.784 1.75-1.75 1.75H2.75A1.75 1.75 0 0 1 1 13.25V3.75C1 2.784 1.784 2 2.75 2Zm0 1.5a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V6.75H9.75A1.75 1.75 0 0 1 8 5V3.5H2.75ZM9.5 3.81V5a.25.25 0 0 0 .25.25h1.19L9.5 3.81Z" />
+                                </svg>
+                            </span>
+                            <span>Additional</span>
+                        </span>
+                        <span class="details-tab-count">@selectedConfig.AdditionalProperties.Count</span>
+                    </button>
                 }
-                else
+            </div>
+
+            <div class="tab-panel" role="tabpanel">
+                @if (selectedTab == DetailTab.Overview)
                 {
-                    <h2 id="promote-modal-title">@(promotionErrorMessage is null ? "Confirm promotion" : "Promotion failed")</h2>
-                    <p class="modal-message">Promote <strong>@selectedEntry.FileName</strong> for tenant <strong>@selectedEntry.Tenant</strong> from <strong>@selectedEntry.Environment.ToUpperInvariant()</strong> to <strong>@GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()</strong>?</p>
+                    <div class="section-heading">
+                        <h2>Overview</h2>
+                    </div>
+                    <dl class="overview-grid">
+                        <div>
+                            <dt>Operation unit</dt>
+                            <dd>@DisplayValue(selectedConfig.OperationUnit)</dd>
+                        </div>
+                        <div>
+                            <dt>Channel</dt>
+                            <dd>@DisplayValue(selectedConfig.Channel)</dd>
+                        </div>
+                        <div>
+                            <dt>Trigger</dt>
+                            <dd>@DisplayValue(selectedConfig.Trigger)</dd>
+                        </div>
+                        <div>
+                            <dt>Connector</dt>
+                            <dd>@DisplayValue(selectedConfig.Connector)</dd>
+                        </div>
+                        <div>
+                            <dt>Output type</dt>
+                            <dd>@DisplayValue(selectedConfig.OutputType)</dd>
+                        </div>
+                        <div>
+                            <dt>@GetMatchFieldLabel(selectedEntry)</dt>
+                            <dd>@GetMatchFieldValue(selectedEntry)</dd>
+                        </div>
+                    </dl>
 
-                    @if (promotionErrorMessage is not null)
+                    @if (selectedConfig.Condition is not null)
                     {
-                        <p class="modal-error-message">@promotionErrorMessage</p>
+                        <section class="tab-section">
+                            <h2>Condition</h2>
+                            <p class="condition-description">@DisplayValue(selectedConfig.Condition.Description)</p>
+                            <pre>@selectedConfig.Condition.Expression</pre>
+                        </section>
                     }
+                }
+                else if (selectedTab == DetailTab.InputData)
+                {
+                    <div class="section-heading">
+                        <h2>Input data</h2>
+                        <span>@selectedConfig.InputData.Count field(s)</span>
+                    </div>
 
-                    <div class="modal-actions">
-                        <button type="button" class="secondary-button" @onclick="ClosePromoteModal">Cancel</button>
-                        <button type="button" class="promote-button" @onclick="PromoteAsync">@(promotionErrorMessage is null ? "Promote" : "Try again")</button>
+                    @if (selectedConfig.InputData.Count == 0)
+                    {
+                        <p class="section-empty">No input fields are defined for this config.</p>
+                    }
+                    else
+                    {
+                        <div class="table-wrap">
+                            <table class="detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Path</th>
+                                        <th>Required</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var input in selectedConfig.InputData)
+                                    {
+                                        <tr>
+                                            <td>@DisplayValue(input.Name)</td>
+                                            <td>@DisplayValue(input.Type)</td>
+                                            <td><code>@DisplayValue(input.Path)</code></td>
+                                            <td>@(input.Required == true ? "Yes" : "No")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+                else if (selectedTab == DetailTab.Mappings)
+                {
+                    <div class="section-heading">
+                        <h2>Mappings</h2>
+                        <span>@selectedConfig.Mapping.Count mapping(s)</span>
+                    </div>
+
+                    @if (selectedConfig.Mapping.Count == 0)
+                    {
+                        <p class="section-empty">No mappings are defined for this config.</p>
+                    }
+                    else
+                    {
+                        <div class="table-wrap">
+                            <table class="detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Input field</th>
+                                        <th>Output field</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var mapping in selectedConfig.Mapping)
+                                    {
+                                        <tr>
+                                            <td><code>@DisplayValue(mapping.InputField)</code></td>
+                                            <td>@DisplayValue(mapping.OutputField)</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+                else if (selectedTab == DetailTab.History)
+                {
+                    <div class="section-heading">
+                        <h2>Git history</h2>
+                        <span>@selectedEntry.Modifications.Count commit(s)</span>
+                    </div>
+
+                    @if (selectedEntry.Modifications.Count == 0)
+                    {
+                        <p class="section-empty">No git history is available for this source file.</p>
+                    }
+                    else
+                    {
+                        <div class="table-wrap">
+                            <table class="detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Message</th>
+                                        <th>Author</th>
+                                        <th>Date</th>
+                                        <th>Commit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var modification in selectedEntry.Modifications)
+                                    {
+                                        <tr>
+                                            <td class="history-message-cell">@modification.Message</td>
+                                            <td>@modification.AuthorName</td>
+                                            <td>@modification.AuthorDate.ToLocalTime():g</td>
+                                            <td>
+                                                <a class="history-commit-link" href="@BuildCommitUrl(modification.Commit)"
+                                                   target="_blank" rel="noreferrer">
+                                                    <code>@modification.Commit[..8]</code>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                }
+                else if (selectedTab == DetailTab.Additional)
+                {
+                    <div class="section-heading">
+                        <h2>Additional sections</h2>
+                        <span>@selectedConfig.AdditionalProperties.Count section(s)</span>
+                    </div>
+
+                    @foreach (var property in selectedConfig.AdditionalProperties.OrderBy(static property => property.Key,
+            StringComparer.OrdinalIgnoreCase))
+                    {
+                        <details class="json-section">
+                            <summary>@property.Key</summary>
+                            <pre>@FormatJson(property.Value)</pre>
+                        </details>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@if (showPromoteModal)
+{
+    <div class="modal-backdrop" @onclick="ClosePromoteModal"></div>
+    <div class="modal-shell" role="dialog" aria-modal="true" aria-labelledby="promote-modal-title">
+        <section class="modal-card">
+            @if (isPromoting)
+            {
+                <h2 id="promote-modal-title">Please wait</h2>
+                <img class="modal-loading-gif" src="images/loading.gif" alt="Loading" />
+                <p class="modal-message">Creating the promotion pull request. This can take a few moments.</p>
+            }
+            else
+            {
+                <h2 id="promote-modal-title">@(promotionErrorMessage is null ? "Confirm promotion" : "Promotion failed")</h2>
+                <p class="modal-message">Promote <strong>@selectedEntry.FileName</strong> for tenant
+                    <strong>@selectedEntry.Tenant</strong> from <strong>@selectedEntry.Environment.ToUpperInvariant()</strong>
+                    to <strong>@GetPromotionTargetEnvironment(selectedEntry).ToUpperInvariant()</strong>?
+                </p>
+
+                @if (promotionErrorMessage is not null)
+                {
+                    <p class="modal-error-message">@promotionErrorMessage</p>
+                }
+
+                <div class="modal-actions">
+                    <button type="button" class="secondary-button" @onclick="ClosePromoteModal">Cancel</button>
+                    <button type="button" class="promote-button" @onclick="PromoteAsync">@(promotionErrorMessage is null ?
+                                                               "Promote" : "Try again")</button>
                     </div>
                 }
             </section>
@@ -600,12 +572,14 @@ else
     private string BuildSourceFileUrl() =>
         selectedEntry is null || selectedRepository is null
             ? "#"
-            : $"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/blob/{Uri.EscapeDataString(selectedRepository.BaseBranch)}/{selectedEntry.SourceFile}";
+            :
+$"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/blob/{Uri.EscapeDataString(selectedRepository.BaseBranch)}/{selectedEntry.SourceFile}";
 
     private string BuildCommitUrl(string commit) =>
         selectedRepository is null
             ? "#"
-            : $"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/commit/{Uri.EscapeDataString(commit)}";
+            :
+$"https://github.com/{Uri.EscapeDataString(selectedRepository.Owner)}/{Uri.EscapeDataString(selectedRepository.Name)}/commit/{Uri.EscapeDataString(commit)}";
 
     private string GetToolbarStatusTitle(ConfigCatalogEntry? entry) =>
         entry is null
@@ -653,13 +627,13 @@ else
                 ? entry.HasMatchingPrdVersion == true ? "Yes" : "No"
                 : "—";
 
-    private static string GetPromoteButtonLabel(ConfigCatalogEntry? entry, bool isPromoting) =>
+    @* private static string GetPromoteButtonLabel(ConfigCatalogEntry? entry, bool isPromoting) =>
         isPromoting
             ? "Creating PR..."
             :
         entry is null
             ? "Promote"
-            : $"Promote to {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}";
+            : $"Promote to {GetPromotionTargetEnvironment(entry).ToUpperInvariant()}"; *@
 
 
     private async Task ConfirmPromoteAsync()
@@ -677,7 +651,8 @@ else
         {
             try
             {
-                await PromotionService.SignInAsync(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority));
+                await
+PromotionService.SignInAsync(NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Authority));
             }
             catch (Exception exception)
             {

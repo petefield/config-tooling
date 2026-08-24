@@ -310,7 +310,24 @@
     width: 1rem;
 }
 
+.header-icon svg {
+    float: left;
+    height: 3rem;
+    width: 2.5rem;
+    padding-top: 0.52rem;
+    margin-right: 0.25rem;
+}
+
 .toolbar-badges {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+.header-badges {
+    float:right;
+    margin-top: 1rem;
     align-items: center;
     display: flex;
     flex-wrap: wrap;
